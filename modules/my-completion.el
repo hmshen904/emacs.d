@@ -90,12 +90,13 @@
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package corfu
+  :ensure t
   :custom
   (corfu-cycle t) ;; allows cycling through candidates
   (corfu-auto t) ;; disables auto-completion
   (corfu-quit-at-boundary nil) ;; needed to use orderless completion with corfu
   :init
-  (corfu-global-mode)
+  (global-corfu-mode)
   :config
   (general-def :keymaps 'corfu-map
     "C-n" 'corfu-next

@@ -9,7 +9,11 @@
 
 (use-package evil
   :init
-  (setq evil-want-keybinding nil)
+  (setq evil-want-keybinding nil
+        evil-respect-visual-line-mode t
+	evil-undo-system 'undo-fu
+	evil-mode-line-format nil)
+
   :custom
   (evil-want-C-u-scroll t) ;; allow scroll up with 'C-u'
   (evil-want-C-d-scroll t) ;; allow scroll down with 'C-d'
@@ -109,19 +113,19 @@
 
     ;; Quit operations
     "q"	  '(:ignore t :which-key "quit emacs")
-    "qz"  'kill-emacs
-    "qq"  'delete-frame
+    "qq"  'kill-emacs
+    ;; "qq"  'delete-frame
 
     ;; Buffer operations
     "b"   '(:ignore t :which-key "buffer")
-    "bb"  'mode-line-other-buffer
+    ;; "bb"  'mode-line-other-buffer
     "bd"  'kill-this-buffer
     "b]"  'next-buffer
     "b["  'previous-buffer
     "bq"  'kill-buffer-and-window
     "bR"  'rename-file-and-buffer
     "br"  'revert-buffer
-    "bm"  'switch-to-buffer
+    "bb"  'switch-to-buffer
 
     ;; Window operations
     "w"   '(:ignore t :which-key "window")
@@ -134,6 +138,7 @@
     "wv"  'evil-window-split
     "ww"  'evil-window-next
     "wd"  'evil-window-delete
+    "wc"  'evil-window-delete
     "wD"  'delete-other-windows
 
     ;; File operations

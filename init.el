@@ -13,6 +13,6 @@
 (require 'my-prog-mode)
 (require 'my-vc)
 (require 'my-latex)
-(require 'my-mode-line)
+;; (require 'my-mode-line)
 ;; (require 'my-mail-setup)
 ;; (require 'my-elfeed)

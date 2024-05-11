@@ -4,9 +4,11 @@
 ;;; Package --- Summary
 ;;; Code:
 
+;; (use-package delight
+;;   :ensure t)
+
 (use-package emacs
   :init
-
   ;; sigh
   (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -72,9 +74,8 @@
   (setq native-comp-async-report-warnings-errors nil)
   (setq load-prefer-newer t)
 
-
   ;; font!
-  (add-to-list 'default-frame-alist '(font . "Noto Sans Mono-12"))
+  (add-to-list 'default-frame-alist '(font . "SF Mono-13"))
 
   ; default modes
   (global-hl-line-mode 1)
@@ -87,6 +88,11 @@
   ;;       (concat
   ;;        (shell-command-to-string
   ;;         "fortune calvin| cowsay -f calvin") "emacs-init-time: " (emacs-init-time)))
+
+  :delight
+  (auto-fill-function " AF")
+  (visual-line-mode)
+
   )
 
 (provide 'my-defaults)
