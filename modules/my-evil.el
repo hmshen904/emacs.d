@@ -92,7 +92,7 @@
             (rename-file filename new-name t)
             (set-visited-file-name new-name t t)))))))
 
-
+  ;; https://magnus.therning.org/2023-07-09-general.el-and-two-ways-to-define-keybindings.html
   (general-def
     "C-x x" 'eval-defun)
 
@@ -119,7 +119,7 @@
     ;; Buffer operations
     "b"   '(:ignore t :which-key "buffer")
     ;; "bb"  'mode-line-other-buffer
-    "bd"  'kill-this-buffer
+    "bk"  'kill-this-buffer
     "b]"  'next-buffer
     "b["  'previous-buffer
     "bq"  'kill-buffer-and-window
@@ -137,7 +137,6 @@
     "w/"  'evil-window-vsplit
     "wv"  'evil-window-split
     "ww"  'evil-window-next
-    "wd"  'evil-window-delete
     "wc"  'evil-window-delete
     "wD"  'delete-other-windows
 
@@ -147,6 +146,7 @@
     "fe"  '(:ignore t :which-key "emacs")
     "fed" 'find-user-init-file
     "feR" 'load-user-init-file
+    "fd"  'dired
     "fj"  'dired-jump
     "fl"  'find-file-literally
     "fR"  'rename-file-and-buffer
@@ -154,7 +154,6 @@
 
     ;; Applications
     "a"   '(:ignore t :which-key "Applications")
-    "ad"  'dired
     ":"   'shell-command
     ";"   'eval-expression
     "ac"  'calendar
@@ -164,7 +163,6 @@
     "wj"  'evil-window-down
     "wk"  'evil-window-up
     "bN"  'evil-buffer-new
-    "fd"  'evil-save-and-close
     )
   )
 

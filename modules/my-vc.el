@@ -9,7 +9,7 @@
   :general
   (leader
    "g"   '(:ignore t :which-key "git")
-   "gs"  'magit-status))
+   "gg"  'magit-status))
 
 (provide 'my-vc)
 ;;; my-vc ends here
