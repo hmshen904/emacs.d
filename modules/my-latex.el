@@ -6,6 +6,7 @@
 
 (use-package auctex
   :no-require t
+  :hook (LaTeX-mode . electric-pair-mode)
   :mode ("\\.tex\\'" . LaTeX-mode)
   :init
   (setq TeX-parse-self t ; parse on load

@@ -62,17 +62,20 @@
   (leader "tsl" 'load-doom-solarized-light
           "tsd" 'load-doom-solarized-dark)
 )
-
 (use-package anti-zenburn-theme
   :ensure t
   :config
   (load-theme 'anti-zenburn))
 
+(use-package hide-mode-line
+  :config
+  (add-hook 'help-mode-hook #'hide-mode-line-mode))
+
 ;; modeline
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
-  :config (setq +modeline-height 25))
+  :config (setq +modeline-height 30))
 
 (provide 'my-themes)
 ;;; my-themes ends here

@@ -6,7 +6,7 @@
 
 (add-to-list 'load-path "~/.config/emacs/modules")
 (require 'my-defaults)
-(require 'my-evil)
+(require 'my-editor)
 (require 'my-themes)
 (require 'my-org-mode)
 (require 'my-completion)
