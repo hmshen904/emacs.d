@@ -120,6 +120,8 @@
     "b"   '(:ignore t :which-key "buffer")
     ;; "bb"  'mode-line-other-buffer
     "bk"  'kill-this-buffer
+    "bn"  'next-buffer
+    "bp"  'previous-buffer
     "b]"  'next-buffer
     "b["  'previous-buffer
     "bq"  'kill-buffer-and-window
@@ -170,11 +172,12 @@
   :general
   ('normal "C-r" 'undo-fu-only-redo))
 
-;; (use-package smartparens-mode
-;;   :ensure smartparens  ;; install the package
-;;   :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
-;;   :config
-;;   ;; load default config
-;;   (require 'smartparens-config))
+(use-package smartparens-mode
+  :straight (:host github :repo "Fuco1/smartparens"
+             :branch "master")
+  :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+  :config
+  ;; load default config
+  (require 'smartparens-config))
 
 (provide 'my-editor)

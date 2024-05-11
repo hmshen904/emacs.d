@@ -63,7 +63,6 @@
           "tsd" 'load-doom-solarized-dark)
 )
 (use-package anti-zenburn-theme
-  :ensure t
   :config
   (load-theme 'anti-zenburn))
 
@@ -73,7 +72,6 @@
 
 ;; modeline
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :config (setq +modeline-height 30))
 

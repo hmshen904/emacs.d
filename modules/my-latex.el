@@ -6,7 +6,6 @@
 
 (use-package auctex
   :no-require t
-  :hook (LaTeX-mode . electric-pair-mode)
   :mode ("\\.tex\\'" . LaTeX-mode)
   :init
   (setq TeX-parse-self t ; parse on load
@@ -36,6 +35,7 @@
   :straight auctex
   :config
   (defun my-LaTeX-mode-hooks ()
+    (latex-electric-env-pair-mode)
     (whitespace-mode)
     (show-paren-mode)
     (visual-line-mode)
@@ -49,10 +49,11 @@
               #'TeX-revert-document-buffer)
   (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
+  (setq TeX-command-default "LaTeXmk")
   (local-leader LaTeX-mode-map
     "p" 'preview-at-point
-    "b" 'TeX-command-master
-    "a" 'TeX-command-run-all
+    "m" 'TeX-command-master
+    "c" 'TeX-command-run-all
     "v" 'TeX-view
     )
 )
@@ -91,6 +92,7 @@
   (org-mode   . turn-on-org-cdlatex)
   :config
   (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
+  (setq cdlatex-paired-parens "([{")
   (setq cdlatex-math-symbol-alist
         '(
           (?0 ("\\varnothing" "\\emptyset" ""))

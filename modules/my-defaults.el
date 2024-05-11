@@ -4,8 +4,7 @@
 ;;; Package --- Summary
 ;;; Code:
 
-;; (use-package delight
-;;   :ensure t)
+;; (use-package delight)
 
 (use-package emacs
   :init
