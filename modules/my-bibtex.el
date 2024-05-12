@@ -3,23 +3,28 @@
 ;;; Emacs Startup File --- my bibtex for Emacs
 ;;; Package --- Summary
 ;;; Code:
-(defvar my-bib-files '("~/some_loc/papers.bib"
-                       "~/some_loc/selfpapers.bib"
-                       "~/some_loc/classics.bib"))
 
-(defvar my-pdf-library '("~/some_loc/pdfs/"))
-
-(defvar my-notes '("~/some_loc/notes.org"))
+(defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))
+(defvar my-pdf-library '("~/Dropbox/10-Resources/Papers/pdfs"))
+(defvar my-notes '("~/Dropbox/10-Resources/Papers/notes"))
+;; (defvar my-csl-styles-dir "~/Dropbox/50-Software/Zotero/styles")
 
 (use-package citar
   :config
   (setq citar-bibliography (symbol-value 'my-bib-files))
   (setq citar-library-paths (symbol-value 'my-pdf-library))
   (setq citar-notes-paths (symbol-value 'my-notes))
+  (setq org-cite-csl-styles-dir (expand-file-name "~/Dropbox/50-Software/Zotero/styles"))
   (setq citar-symbol-separator " ")
   (setq citar-symbols
    `((file "⌘" . " ") (note "✎" . " ") (link "⚓" . " ")))
   (setq citar-at-point-function 'embark-act)
+  (setq citar-templates
+	'((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
+	  (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
+	  (preview . "${author::%etal} (${date year issued:4}) ${title}\n")
+	  (default-preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+	  (note . "Notes on ${author editor:%etal}, ${title}")))
 
   (with-eval-after-load 'oc
     (setq org-cite-insert-processor 'citar)
@@ -66,13 +71,24 @@
   :general
   (leader
     "ab"  'citar-open)
+
+  :general-config
   (local-leader
     :keymaps '(org-mode-map LaTeX-mode-map)
-    "c"  'citar-insert-citation)
+    "b"  '(:ignore t :which-key "bibliography")
+    "bb" 'citar-open
+    "bi" 'citar-insert-citation
+    "br" 'citar-insert-reference
+    "bk" 'citar-insert-keys
+    "bn" 'citar-open-notes
+    "bo" 'citar-open-files
+    "bl" 'citar-open-links
+    ;; "c"  'citar-insert-citation
+    )
   )
 
 (use-package biblio
-  :general
+  :general-config
   (local-leader bibtex-mode-map
     "i" 'biblio-doi-insert-bibtex))
 
@@ -95,6 +111,8 @@
         bibtex-autokey-names-stretch 1
         bibtex-autokey-year-title-separator "_"
         bibtex-maintain-sorted-entries t)
+
+  :general-config
   (general-def '(normal insert visual emacs) bibtex-mode-map
     "C-n"  'bu-next-entry
     "C-p"  'bu-previous-entry
@@ -103,7 +121,7 @@
     "o" 'bu-open-doc
     "K" 'bu-make-field-keywords
     "c" 'bibtex-clean-entry)
-  :general
+
   (local-leader
     :keymaps '(LaTeX-mode-map)
     "o" 'bu-jump-to-doc))

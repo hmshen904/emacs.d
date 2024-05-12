@@ -59,12 +59,29 @@
   ;; Corrects (and improves) org-mode's native fontification.
   ;; (doom-themes-org-config)
 
-  (leader "tsl" 'load-doom-solarized-light
-          "tsd" 'load-doom-solarized-dark)
+  ;; (leader "tsl" 'load-doom-solarized-light
+  ;;         "tsd" 'load-doom-solarized-dark)
 )
 (use-package anti-zenburn-theme
   :config
-  (load-theme 'anti-zenburn))
+
+  (defun load-anti-zenburn ()
+      "Load the `doom-anti-zenburn' theme."
+      (interactive)
+      (load-theme 'anti-zenburn t))
+  (leader "tsa" 'load-anti-zenburn)
+  )
+
+(use-package leuven-theme
+  :config
+  (defun load-leuven-light ()
+      "Load the `doom-leuven' theme."
+      (interactive)
+      (load-theme 'leuven t))
+  (leader "tsl" 'load-leuven-light)
+  )
+
+(load-leuven-light)
 
 (use-package hide-mode-line
   :config

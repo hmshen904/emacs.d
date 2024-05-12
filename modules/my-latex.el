@@ -6,6 +6,7 @@
 
 (use-package auctex
   :no-require t
+  :hook (LaTeX-mode . visual-fill-column-mode)
   :mode ("\\.tex\\'" . LaTeX-mode)
   :init
   (setq TeX-parse-self t ; parse on load
@@ -49,6 +50,9 @@
               #'TeX-revert-document-buffer)
   (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
+  ;; (setq TeX-electric-math (cons "\\(" "\\)"))
+  (setq LaTeX-electric-left-right-brace t)
+  (setq prettify-symbols-unprettify-at-point 'right-edge)
   (setq TeX-command-default "LaTeXmk")
   (local-leader LaTeX-mode-map
     "p" 'preview-at-point
@@ -87,12 +91,15 @@
 ;;                     "qq" (lambda () (interactive) (laas-wrap-previous-object "sqrt"))))
 
 (use-package cdlatex
+  :init
+  (setq cdlatex-takeover-parenthesis nil)
   :hook
   (LaTeX-mode . turn-on-cdlatex)
   (org-mode   . turn-on-org-cdlatex)
   :config
-  (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
-  (setq cdlatex-paired-parens "([{")
+  ;; (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
+  (setq cdlatex-use-dollar-to-ensure-math nil)
+  ;; (setq cdlatex-paired-parens "$([{|")
   (setq cdlatex-math-symbol-alist
         '(
           (?0 ("\\varnothing" "\\emptyset" ""))
@@ -159,9 +166,10 @@
           ("twcl" "Insert two columns env" "" cdlatex-environment ("twcl") t nil))
         )
 
-  (general-define-key
+  :general-config
+  (general-def
    :states '(normal insert)
-   :keymaps 'cdlatex-mode-map
+   :keymaps '(cdlatex-mode-map org-mode-map)
    "M-;" 'cdlatex-tab)
   )
 

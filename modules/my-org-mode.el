@@ -12,7 +12,9 @@
     (display-line-numbers-mode t)
     (flyspell-mode)
     (outline-minor-mode)
-    (electric-pair-mode))
+    (electric-pair-mode 0)
+    ;; (electric-pair-mode) ;; has to be disabled other wise \( ... \) cannot be paired properly
+    )
   (add-hook 'org-mode-hook 'my-org-mode-hooks)
   :general
   (leader
