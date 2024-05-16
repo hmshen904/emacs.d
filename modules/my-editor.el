@@ -1,10 +1,5 @@
-;;; my-editor.el --- My editor config for Emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-;;; Emacs Startup File --- my editor for Emacs
-;;; Package --- Summary
-;;; Code:
-
 (use-package which-key
+  :diminish
   :config (which-key-mode 1))
 
 (use-package evil
@@ -22,45 +17,29 @@
 
 (use-package evil-collection
   :after evil
-  :ensure t
+  :diminish
+  ;; :ensure t
   ;; :custom
   ;; (evil-collection-setup-minibuffer t)
   :config
   (evil-collection-init))
 
+(use-package evil-easymotion
+  :after evil
+  :diminish)
+
 (use-package evil-surround
   :after evil
+  :diminish
   :config (global-evil-surround-mode 1))
 
 (use-package evil-commentary
   :after evil
+  :diminish
   :config
   (evil-commentary-mode) ;; globally enable evil-commentary
   )
 
-;; * Best Practices by the author of general.ed
-;; To facilitate extensibility and easy creation of wrappers, ~general-define-key~ uses keyword arguments to specify everything besides the key definitions, including for the =:states= and =:keymaps=. Since users will most often specify one or both of these keyword arguments, ~general-define-key~ is often less concise than ~define-key~ or ~evil-define-key~. It is for this reason that it is recommended that ~general-define-key~ not be used directly. =general.el= provides wrappers around ~general-define-key~ that take positional arguments like ~define-key~ and ~evil-define-key~ (~general-emacs-define-key~, ~general-evil-define-key~, and ~general-def~). It is recommended that you use these instead of ~general-define-key~. ~general-create-definer~ can also be used to create a new definer with certain default settings (e.g. prefix settings). For clarity and consistency, examples in the documentation usually use ~general-define-key~ unless the example is explicitly for a wrapper. However, [[#positional-argument-wrappers][~general-def~]] is recommended over ~general-define-key~ as it is more flexible and concise. Positional arguments are /optional but not required/, so ~general-def~ can mostly act as a drop-in replacement for many key definers (including ~general-define-key~, ~define-key~, and ~evil-define-key~). Note that ~general-create-definer~ and the =:general= keyword argument for ~use-package~ use ~general-def~. I personally only use ~general-def~.
-
-;; Since it is more common for commands to not be sharp quoted in key definitions, this package's examples use single quotes for commands. I personally prefer to always properly sharp quote functions, so commands in the actual non-example code are always sharp quoted.
-
-;; Although ~general-define-key~ will automatically defer keybindings until the specified keymaps exist, it is recommended you use it with ~with-eval-after-load~ or use-package's =:config= keyword instead. This is because while the deferring mechanism works, it is much slower than using ~eval-after-load~. See [[#will-generalel-slow-my-initialization-time][Will general.el slow my initialization time?]] for more information on ensuring you are not unnecessarily slowing down Emacs initialization.
-
-;; See also the rest of [[#faq][FAQ]] for commonly asked questions
-
-;; To summarize, my recommended usage of general.el looks like this:
-;; - Use ~general-def~, other positional definers, and your own definers created with ~general-create-definer~
-;; - Use =use-package= or a similar helper
-;; - Use =:general= for keybindings meant to load a package
-;; - Use =:general-config= or =:config= for other keybindings
-;; - Do not use use the =:which-key= extended definition keyword unless you absolutely need to (see [[#which-key-integration][Which Key Integration]] for details)
-;; - Follow the other recommendations in [[#will-generalel-slow-my-initialization-time][Will general.el slow my initialization time?]]
-
-;; From a stylistic perspective (completely personal preference) I:
-;; - Explicitly use the command name with =:general=, e.g. ~:general (general-def <keymap> ...)~ instead of ~:general (<keymap> ...)~. This allows individually evaling the forms or moving them elsewhere without having to change them.
-;; - Sharp quote commands (e.g. ~#'execute-extended-command~) but not lambdas
-
-
-;; key bindings
 (use-package general
   :after evil
   :config
@@ -93,21 +72,30 @@
   ;; some useful functions
 
   ;; open config directory
-  (defvar user-config-dir "~/.config/emacs/modules")
   (defun open-user-config-dir ()
     "Open the `user-config-dire' in the same window"
     (interactive)
-    (dired user-config-dir))
+    (dired my-config-dir))
 
-  (defun find-user-init-file ()
-    "Edit the `user-init-file', in same window."
+  (defun find-user-config-file ()
+    "Edit the `user-config-file', in same window."
     (interactive)
-    (find-file user-init-file))
+    (find-file my-config-file))
 
   (defun load-user-init-file ()
     "Load the `user-init-file', in same window."
     (interactive)
-    (load-file user-init-file))
+    (load-file my-init-file))
+
+  (defun open-iTerm-here ()
+    "Open item at the current path"
+    (interactive)
+    (shell-command "open -a iTerm ."))
+
+  (defun open-Finder-here ()
+    "Open Finder at the current path"
+    (interactive)
+    (shell-command "open ."))
 
   ;;Taken from http://emacsredux.com/blog/2013/05/04/rename-file-and-buffer/
   (defun rename-file-and-buffer ()
@@ -134,6 +122,17 @@
     "h"   (general-simulate-key "C-h")
     "x"   (general-simulate-key "C-x")
     "u"   '(universal-argument :wk "C-u")
+
+    ;; jumpers
+    "j"   '(:ignore t :which-key "jump")
+    "jl"  'evilem-motion-next-visual-line
+    "jk"  'evilem-motion-previous-visual-line
+    "jt"  'evilem-motion-find-char-to
+    "jT"  'evilem-motion-find-char-to-backward
+    "jf"  'evilem-motion-find-char
+    "jF"  'evilem-motion-find-char-backward
+    "j("  'evilem-motion-backward-sentence-begin
+    "j)"  'evilem-motion-forward-sentence-begin
 
     ;; Theme operations
     "t"   '(:ignore t :which-key "themes")
@@ -177,8 +176,8 @@
     "f"   '(:ignore t :which-key "files")
     "fc"  'write-file
     "fe"  '(:ignore t :which-key "emacs")
-    "fed" 'find-user-init-file
-    "feD" 'open-user-config-dir
+    "fei" 'find-user-init-file
+    "fed" 'open-user-config-dir
     "feR" 'load-user-init-file
     "fd"  'dired
     "fb"  'bookmark-bmenu-list
@@ -188,10 +187,12 @@
     "fs"  'save-buffer
 
     ;; Applications
-    "a"   '(:ignore t :which-key "Applications")
     ":"   'shell-command
     ";"   'eval-expression
+    "a"   '(:ignore t :which-key "Applications")
     "ac"  'calendar
+    "at"  'open-iTerm-here
+    "af"  'open-Finder-here
 
     "wh"  'evil-window-left
     "wl"  'evil-window-right
@@ -209,6 +210,7 @@
   :straight (:host github :repo "Fuco1/smartparens"
              :branch "master")
   :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+  :diminish
   :config
   ;; load default config
   (require 'smartparens-config))

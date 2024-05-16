@@ -1,18 +1,10 @@
-;;; init.el --- Initialization file for Emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-;;; Emacs Startup File --- initialization for Emacs
-;;; Package --- Summary
-;;; Code:
-
-(add-to-list 'load-path "~/.config/emacs/modules")
+(add-to-list 'load-path my-module-path)
 (require 'my-defaults)
 (require 'my-editor)
-(require 'my-themes)
-(require 'my-org-mode)
+(require 'my-ui)
 (require 'my-completion)
-(require 'my-prog-mode)
-(require 'my-vc)
+(require 'my-org)
 (require 'my-latex)
-;; (require 'my-mode-line)
-;; (require 'my-mail-setup)
-;; (require 'my-elfeed)
+(require 'my-code)
+(require 'my-vc)
+(switch-to-buffer "*scratch*")

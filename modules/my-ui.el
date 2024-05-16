@@ -1,9 +1,3 @@
-;;; my-themes.el --- Eye candy for Emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-;;; Emacs Startup File --- themes for Emacs
-;;; Package --- Summary
-;;; Code:
-
 (with-eval-after-load 'general
   (defun disable-all-themes ()
     "disable all active themes."
@@ -70,8 +64,7 @@
       "Load the `doom-anti-zenburn' theme."
       (interactive)
       (load-theme 'anti-zenburn t))
-  (leader "tsa" #'load-anti-zenburn)
-  )
+  (leader "tsa" #'load-anti-zenburn))
 
 (use-package leuven-theme
   :config
@@ -80,7 +73,7 @@
       (interactive)
       (load-theme 'leuven t)))
 
-;; (load-leuven-light) ;; its modeline does not plays well with visual-fill-column
+(load-anti-zenburn)
 
 (use-package hide-mode-line
   :diminish
@@ -101,15 +94,4 @@
   (setq olivetti-body-width 120)
   (setq olivetti-minimum-body-width 120))
 
-;; I could not make the visual-fill-column mode work with my modeline
-;; (use-package visual-fill-column
-;;   :config
-;;   (setq visual-fill-column-width 100
-;;         visual-fill-column-adjust-for-text-scale t)
-;;   (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust))
-
-(load-anti-zenburn)
-;; (load-leuven-light)
-
-(provide 'my-themes)
-;;; my-themes ends here
+(provide 'my-ui)

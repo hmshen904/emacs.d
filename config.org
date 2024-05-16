@@ -1,0 +1,1645 @@
+#+title: my emacs config
+#+author: Fat Belly
+#+date: \today{}
+#+email: optimalfatbelly@gmail.com
+#+language: en
+#+options: ':t toc:nil num:t author:t email:t
+#+startup: content indent
+#+macro: latest-export-date (eval (format-time-string "%F %T %z"))
+#+macro: word-count (eval (count-words (point-min) (point-max)))
+
+*Last revised and exported on {{{latest-export-date}}} with a word count of {{{word-count}}}.*
+
+Stolen from https://protesilaos.com/emacs/dotemacs
+
+The basic idea is to use this =config.org= document to automatically
+generate all the config files, including =early-init.el=, =init.el=,
+as well as all the package configurations under the directory
+=./module/=. Whenever this file is updated, I can evaluate the
+following code block or do =C-c C-v C-t=, which will update all files
+accordingly.
+
+#+begin_src emacs-lisp :tangle no :results none
+(org-babel-tangle)
+#+end_src
+
+* The early initialisation of Emacs (=early-init.el=)
+
+This is the first file that Emacs reads when starting up. It should
+contain code that does not depend on any package or the proportions of
+the Emacs frame. In general, this early initialisation file is meant
+to set up a few basic things before Emacs produces the initial frame
+by delegating to the =init.el=
+
+** The =early-init.el= initialises =straight.el= and =use-package.el=
+
+#+begin_src emacs-lisp :tangle "early-init.el"
+;; disable package.el
+(setq package-enable-at-startup nil)
+(setq straight-use-package-by-default t) ;; have use-package use straight.el by default.
+
+;; straight.el init
+;; source: https://github.com/radian-software/straight.el?tab=readme-ov-file#getting-started
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; install use-package via straight
+(straight-use-package 'use-package) 
+#+end_src
+
+** The =early-init.el= gives a name to the default frame
+
+#+begin_src emacs-lisp :tangle "early-init.el"
+(add-hook 'after-init-hook (lambda () (set-frame-name "home")))
+#+end_src
+
+** Define all my paths in =early-init.el=
+
+#+begin_src emacs-lisp :tangle "early-init.el"
+(defvar my-module-path "~/.config/emacs/modules")
+#+end_src
+
+* The main initialisation of Emacs (=init.el=)
+
+This is where I define the Lisp macros used in my setup and load all the invidiual modules.
+
+#+begin_src emacs-lisp :tangle "init.el"
+  (add-to-list 'load-path my-module-path)
+  (require 'my-defaults)
+  (require 'my-editor)
+  (require 'my-ui)
+  (require 'my-completion)
+  (require 'my-org)
+  (require 'my-latex)
+  (require 'my-code)
+  (require 'my-vc)
+  (switch-to-buffer "*scratch*")
+#+end_src
+
+* The default configurations (=my-defaults.el=)
+
+** configs using =use-package.el=
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (use-package emacs
+    :init
+    ;; sigh
+    (defalias 'yes-or-no-p 'y-or-n-p)
+
+    ; which directory to put backup files
+    (setq backup-directory-alist `(("." . "~/.config/emacs/backups")))
+
+    ;transform backups file name
+    (setq auto-save-file-name-transforms '((".*" "~/.config/emacs/auto-save-list/" t)))
+
+    ; toggle wrapping text at the 80th character
+    (setq fill-column 80)
+    (setq-default word-wrap t)
+
+    ; turn off alarm
+    (setq ring-bell-function 'ignore)
+
+    ; disable scroll bar
+    (scroll-bar-mode -1)
+
+    ; do not display splash screen on startup
+    (setq inhibit-splash-screen t)
+
+    ; redisplay never recenters cursor
+    (setq scroll-conservatively 101)
+
+    ; spell checker
+    (setq ispell-program-name "hunspell")
+
+    ;; help window modifications
+    (setq help-window-select t)
+    (customize-set-variable
+          'display-buffer-alist
+          '(("\\*Help\\*" display-buffer-below-selected)))
+
+    ;; relative line numbers
+    (with-eval-after-load 'display-line-numbers
+      (setq display-line-numbers-type 'relative
+            display-line-numbers-width-start t))
+
+    ;; tabs are evil
+    (setq indent-tabs-mode nil)
+
+    ;; always follow symlinks in git dirs
+    (setq vc-follow-symlinks t)
+
+    ;; whitespace
+    (setq whitespace-style '(face trailing))
+
+    ;; utf8 in every nook and cranny
+    (set-charset-priority 'unicode)
+    (setq locale-coding-system 'utf-8
+          coding-system-for-read 'utf-8
+          coding-system-for-write 'utf-8)
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (set-selection-coding-system 'utf-8)
+    (prefer-coding-system 'utf-8)
+    (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+
+    ;; persist a custom file
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    (when (file-exists-p custom-file)
+    (load custom-file))
+
+    ; fix =defvar= warnings
+    (setq enable-local-variables :all)
+
+    ;; use trash-cli rather than rm when deleting files.
+    (setq delete-by-moving-to-trash t)
+
+    ;; less noise when compiling elisp
+    (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+    (setq native-comp-async-report-warnings-errors nil)
+    (setq load-prefer-newer t)
+
+    ;; font!
+    (add-to-list 'default-frame-alist '(font . "SF Mono-13"))
+
+    ; default modes
+    (global-hl-line-mode 1)
+    (blink-cursor-mode 0)
+    (recentf-mode 1)
+    (show-paren-mode t)
+    (flymake-mode -1)
+
+    ;; set_this
+    ;; (setq initial-scratch-message
+    ;;       (concat
+    ;;        (shell-command-to-string
+    ;;         "fortune calvin| cowsay -f calvin") "emacs-init-time: " (emacs-init-time)))
+
+    :delight
+    (auto-fill-function " AF")
+    (visual-line-mode))
+#+end_src
+
+** diminisher
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (use-package diminish)
+#+end_src
+
+** paths
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (setq my-config-dir "~/.config/emacs")
+  (setq my-org-dir "~/Dropbox/Org")
+
+  (setq my-config-path (concat (file-name-as-directory my-config-dir) "config.org"))
+  (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
+  (setq my-journal-dir (concat (file-name-as-directory my-org-dir) "journal"))
+  (setq my-org-inbox (concat (file-name-as-directory my-org-dir) "inbox.org"))
+  (setq my-org-gtd (concat (file-name-as-directory my-org-dir) "gtd.org"))
+  (setq my-org-projects (concat (file-name-as-directory my-org-dir) "projects.org"))
+  (setq my-org-reading (concat (file-name-as-directory my-org-dir) "readings.org"))
+  (setq my-org-proposals (concat (file-name-as-directory my-org-dir) "proposals.org"))
+  (setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
+  (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
+  (setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
+
+#+end_src
+
+** my-defaults provider
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (provide 'my-defaults)
+#+end_src
+
+* The editor configurations (=my-editor.el=)
+
+** evil configs 
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (use-package which-key
+    :diminish
+    :config (which-key-mode 1))
+
+  (use-package evil
+    :init
+    (setq evil-want-keybinding nil
+          evil-respect-visual-line-mode t
+  	evil-undo-system 'undo-fu
+  	evil-mode-line-format nil)
+
+    :custom
+    (evil-want-C-u-scroll t) ;; allow scroll up with 'C-u'
+    (evil-want-C-d-scroll t) ;; allow scroll down with 'C-d'
+    :config
+    (evil-mode 1))
+
+  (use-package evil-collection
+    :after evil
+    :diminish
+    ;; :ensure t
+    ;; :custom
+    ;; (evil-collection-setup-minibuffer t)
+    :config
+    (evil-collection-init))
+
+  (use-package evil-easymotion
+    :after evil
+    :diminish)
+
+  (use-package evil-surround
+    :after evil
+    :diminish
+    :config (global-evil-surround-mode 1))
+
+  (use-package evil-commentary
+    :after evil
+    :diminish
+    :config
+    (evil-commentary-mode) ;; globally enable evil-commentary
+    )
+#+end_src
+
+** key bindings using =general.el=
+
+*** best practices by the author of =general.el=
+
+To facilitate extensibility and easy creation of wrappers, ~general-define-key~ uses keyword arguments to specify everything besides the key definitions, including for the =:states= and =:keymaps=. Since users will most often specify one or both of these keyword arguments, ~general-define-key~ is often less concise than ~define-key~ or ~evil-define-key~. It is for this reason that it is recommended that ~general-define-key~ not be used directly. =general.el= provides wrappers around ~general-define-key~ that take positional arguments like ~define-key~ and ~evil-define-key~ (~general-emacs-define-key~, ~general-evil-define-key~, and ~general-def~). It is recommended that you use these instead of ~general-define-key~. ~general-create-definer~ can also be used to create a new definer with certain default settings (e.g. prefix settings). For clarity and consistency, examples in the documentation usually use ~general-define-key~ unless the example is explicitly for a wrapper. However, [[#positional-argument-wrappers][~general-def~]] is recommended over ~general-define-key~ as it is more flexible and concise. Positional arguments are /optional but not required/, so ~general-def~ can mostly act as a drop-in replacement for many key definers (including ~general-define-key~, ~define-key~, and ~evil-define-key~). Note that ~general-create-definer~ and the =:general= keyword argument for ~use-package~ use ~general-def~. I personally only use ~general-def~.
+
+Since it is more common for commands to not be sharp quoted in key definitions, this package's examples use single quotes for commands. I personally prefer to always properly sharp quote functions, so commands in the actual non-example code are always sharp quoted.
+
+Although ~general-define-key~ will automatically defer keybindings until the specified keymaps exist, it is recommended you use it with ~with-eval-after-load~ or use-package's =:config= keyword instead. This is because while the deferring mechanism works, it is much slower than using ~eval-after-load~. See [[#will-generalel-slow-my-initialization-time][Will general.el slow my initialization time?]] for more information on ensuring you are not unnecessarily slowing down Emacs initialization.
+
+See also the rest of [[#faq][FAQ]] for commonly asked questions
+
+To summarize, my recommended usage of general.el looks like this:
+- Use ~general-def~, other positional definers, and your own definers created with ~general-create-definer~
+- Use =use-package= or a similar helper
+- Use =:general= for keybindings meant to load a package
+- Use =:general-config= or =:config= for other keybindings
+- Do not use use the =:which-key= extended definition keyword unless you absolutely need to (see [[#which-key-integration][Which Key Integration]] for details)
+- Follow the other recommendations in [[#will-generalel-slow-my-initialization-time][Will general.el slow my initialization time?]]
+
+From a stylistic perspective (completely personal preference) I:
+- Explicitly use the command name with =:general=, e.g. ~:general (general-def <keymap> ...)~ instead of ~:general (<keymap> ...)~. This allows individually evaling the forms or moving them elsewhere without having to change them.
+- Sharp quote commands (e.g. ~#'execute-extended-command~) but not lambdas
+
+*** configs
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (use-package general
+    :after evil
+    :config
+    (setq general-override-states '(insert
+                                    emacs
+                                    hybrid
+                                    normal
+                                    visual
+                                    motion
+                                    operator
+                                    replace))
+    ;; (general-override-mode 1)
+
+    ;; leader key SPC similar to spacemacs
+    (general-create-definer leader
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :non-normal-prefix "C-SPC" ;; access leader in insert and mode
+      )
+
+    ;; local leader key SPC similar to spacemacs
+    (general-create-definer local-leader
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC m"
+      :non-normal-prefix "C-SPC m" ;; access local leader in insert mode
+      )
+
+    ;; some useful functions
+
+    ;; open config directory
+    (defun open-user-config-dir ()
+      "Open the `user-config-dire' in the same window"
+      (interactive)
+      (dired my-config-dir))
+
+    (defun find-user-config-file ()
+      "Edit the `user-config-file', in same window."
+      (interactive)
+      (find-file my-config-file))
+
+    (defun load-user-init-file ()
+      "Load the `user-init-file', in same window."
+      (interactive)
+      (load-file my-init-file))
+
+    (defun open-iTerm-here ()
+      "Open item at the current path"
+      (interactive)
+      (shell-command "open -a iTerm ."))
+
+    (defun open-Finder-here ()
+      "Open Finder at the current path"
+      (interactive)
+      (shell-command "open ."))
+
+    ;;Taken from http://emacsredux.com/blog/2013/05/04/rename-file-and-buffer/
+    (defun rename-file-and-buffer ()
+      "Rename the current buffer and file it is visiting."
+      (interactive)
+      (let ((filename (buffer-file-name)))
+        (if (not (and filename (file-exists-p filename)))
+            (message "Buffer is not visiting a file!")
+          (let ((new-name (read-file-name "New name: " filename)))
+            (cond
+             ((vc-backend filename) (vc-rename-file filename new-name))
+             (t
+              (rename-file filename new-name t)
+              (set-visited-file-name new-name t t)))))))
+
+    ;; https://magnus.therning.org/2023-07-09-general.el-and-two-ways-to-define-keybindings.html
+    (general-def
+      "C-x x" 'eval-defun)
+
+    (leader
+
+      ""     nil
+      "c"   (general-simulate-key "C-c")
+      "h"   (general-simulate-key "C-h")
+      "x"   (general-simulate-key "C-x")
+      "u"   '(universal-argument :wk "C-u")
+
+      ;; jumpers
+      "j"   '(:ignore t :which-key "jump")
+      "jl"  'evilem-motion-next-visual-line
+      "jk"  'evilem-motion-previous-visual-line
+      "jt"  'evilem-motion-find-char-to
+      "jT"  'evilem-motion-find-char-to-backward
+      "jf"  'evilem-motion-find-char
+      "jF"  'evilem-motion-find-char-backward
+      "j("  'evilem-motion-backward-sentence-begin
+      "j)"  'evilem-motion-forward-sentence-begin
+
+      ;; Theme operations
+      "t"   '(:ignore t :which-key "themes")
+      "tn"  'my/cycle-theme
+      "tt"  'load-theme
+      "tl"  'load-leuven-theme
+      "td"  'load-dichromacy-theme
+
+      ;; Quit operations
+      "q"	  '(:ignore t :which-key "quit emacs")
+      "qq"  'kill-emacs
+      ;; "qq"  'delete-frame
+
+      ;; Buffer operations
+      "b"   '(:ignore t :which-key "buffer")
+      ;; "bb"  'mode-line-other-buffer
+      "bk"  'kill-this-buffer
+      "bn"  'next-buffer
+      "bp"  'previous-buffer
+      "b]"  'next-buffer
+      "b["  'previous-buffer
+      "bq"  'kill-buffer-and-window
+      "bR"  'rename-file-and-buffer
+      "br"  'revert-buffer
+      "bb"  'switch-to-buffer
+
+      ;; Window operations
+      "w"   '(:ignore t :which-key "window")
+      "wn"  'evil-window-vnew
+      "w>"  'evil-window-increase-width
+      "w<"  'evil-window-decrease-width
+      "w+"  'evil-window-increase-height
+      "w-"  'evil-window-increase-height
+      "w/"  'evil-window-vsplit
+      "wv"  'evil-window-split
+      "ww"  'evil-window-next
+      "wc"  'evil-window-delete
+      "wD"  'delete-other-windows
+
+      ;; File operations
+      "f"   '(:ignore t :which-key "files")
+      "fc"  'write-file
+      "fe"  '(:ignore t :which-key "emacs")
+      "fei" 'find-user-init-file
+      "fed" 'open-user-config-dir
+      "feR" 'load-user-init-file
+      "fd"  'dired
+      "fb"  'bookmark-bmenu-list
+      "fj"  'dired-jump
+      "fl"  'find-file-literally
+      "fR"  'rename-file-and-buffer
+      "fs"  'save-buffer
+
+      ;; Applications
+      ":"   'shell-command
+      ";"   'eval-expression
+      "a"   '(:ignore t :which-key "Applications")
+      "ac"  'calendar
+      "at"  'open-iTerm-here
+      "af"  'open-Finder-here
+
+      "wh"  'evil-window-left
+      "wl"  'evil-window-right
+      "wj"  'evil-window-down
+      "wk"  'evil-window-up
+      "bN"  'evil-buffer-new
+      )
+    )
+
+#+end_src
+
+** undo 
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (use-package undo-fu
+    :general
+    ('normal "C-r" 'undo-fu-only-redo))
+#+end_src
+
+** smartparens
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (use-package smartparens-mode
+    :straight (:host github :repo "Fuco1/smartparens"
+               :branch "master")
+    :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+    :diminish
+    :config
+    ;; load default config
+    (require 'smartparens-config))
+#+end_src
+
+** my-editor provider
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (provide 'my-editor)
+#+end_src
+
+* The user interface configurations (=my-ui.el=)
+
+** themes 
+
+*** theme cycling 
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (with-eval-after-load 'general
+    (defun disable-all-themes ()
+      "disable all active themes."
+      (dolist (i custom-enabled-themes)
+        (disable-theme i)))
+
+    (defadvice load-theme (before disable-themes-first activate)
+      (disable-all-themes))
+
+    ;; Following lines to cycle through themes adapted from ivan's answer on
+    ;; https://emacs.stackexchange.com/questions/24088/make-a-function-to-toggle-themes
+    (setq my/themes (custom-available-themes))
+    (setq my/themes-index 0)
+
+    (defun my/cycle-theme ()
+      "Cycles through my themes."
+      (interactive)
+      (setq my/themes-index (% (1+ my/themes-index) (length my/themes)))
+      (my/load-indexed-theme))
+
+    (defun my/load-indexed-theme ()
+      (load-theme (nth my/themes-index my/themes)))
+
+    (leader "t"   '(:ignore t :which-key "themes")
+            "tn"  'my/cycle-theme
+            "tt"  'load-theme)
+  )
+#+end_src
+
+*** doom themes
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package doom-themes
+    ;; :hook (after-init . load-doom-one-light)
+    :config
+
+    (defun load-doom-one-light ()
+        "Load the `doom-one-light' theme."
+        (interactive)
+        (load-theme 'doom-one-light))
+
+    (defun load-doom-solarized-dark ()
+        "Load the `doom-solarized-dark' theme."
+        (interactive)
+        (load-theme 'doom-solarized-dark))
+
+    (defun load-doom-solarized-light ()
+        "Load the `doom-solarized-light' theme."
+        (interactive)
+        (load-theme 'doom-solarized-light))
+
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+    ;; Enable flashing mode-line on errors
+    ;; (doom-themes-visual-bell-config)
+    ;; Corrects (and improves) org-mode's native fontification.
+    ;; (doom-themes-org-config)
+
+    ;; (leader "tsl" 'load-doom-solarized-light
+    ;;         "tsd" 'load-doom-solarized-dark)
+  )
+#+end_src
+
+*** anti-zenburn
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package anti-zenburn-theme
+    :config
+
+    (defun load-anti-zenburn ()
+        "Load the `doom-anti-zenburn' theme."
+        (interactive)
+        (load-theme 'anti-zenburn t))
+    (leader "tsa" #'load-anti-zenburn))
+#+end_src
+
+*** leuven
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package leuven-theme
+    :config
+    (defun load-leuven-light ()
+        "Load the `doom-leuven' theme."
+        (interactive)
+        (load-theme 'leuven t)))
+#+end_src
+
+*** default theme
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (load-anti-zenburn)
+#+end_src
+
+** modeline
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package hide-mode-line
+    :diminish
+    :config
+    (add-hook 'help-mode-hook #'hide-mode-line-mode))
+
+  ;; modeline
+  (use-package doom-modeline
+    :init
+    (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 25))
+#+end_src
+
+** soft-wrapper
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package olivetti
+    :diminish
+    :commands olivetti-mode
+    :config
+    (setq olivetti-body-width 120)
+    (setq olivetti-minimum-body-width 120))
+#+end_src
+
+** my-ui provider
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (provide 'my-ui)
+#+end_src
+
+* The completion configurations (=my-completion.el=)
+
+#+begin_src emacs-lisp :tangle "modules/my-completion.el" :mkdirp yes
+  (use-package vertico
+    :init
+    (setq vertico-cycle t)
+    :config
+    (vertico-mode)
+    (leader
+     "SPC" 'execute-extended-command
+     ;; "bm"  'switch-to-buffer
+     "ff"  'find-file))
+
+  (use-package orderless
+    :config
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
+
+  (use-package savehist
+    :straight (:type built-in)
+    :config
+    (savehist-mode))
+
+  (use-package marginalia
+    :after vertico
+    :custom
+    (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+    :config
+    (marginalia-mode))
+
+  (use-package embark
+    :general
+    ("C-." 'embark-act)          ;; pick some comfortable binding
+    :init
+    (setq prefix-help-command #'embark-prefix-help-command)
+    :config
+    ;; stolen from https://github.com/patrl/emacs.d
+    (defun embark-which-key-indicator ()
+      "An embark indicator that displays keymaps using which-key.
+    The which-key help message will show the type and value of the
+    current target followed by an ellipsis if there are further
+    targets."
+      (lambda (&optional keymap targets prefix)
+        (if (null keymap)
+            (which-key--hide-popup-ignore-command)
+          (which-key--show-keymap
+           (if (eq (plist-get (car targets) :type) 'embark-become)
+               "Become"
+             (format "Act on %s '%s'%s"
+                     (plist-get (car targets) :type)
+                     (embark--truncate-target (plist-get (car targets) :target))
+                     (if (cdr targets) "…" "")))
+           (if prefix
+               (pcase (lookup-key keymap prefix 'accept-default)
+                 ((and (pred keymapp) km) km)
+                 (_ (key-binding prefix 'accept-default)))
+             keymap)
+           nil nil t (lambda (binding)
+                       (not (string-suffix-p "-argument" (cdr binding))))))))
+
+    (setq embark-indicators
+      '(embark-which-key-indicator
+        embark-highlight-indicator
+        embark-isearch-highlight-indicator))
+
+    (defun embark-hide-which-key-indicator (fn &rest args)
+      "Hide the which-key indicator immediately when using the completing-read prompter."
+      (which-key--hide-popup-ignore-command)
+      (let ((embark-indicators
+             (remq #'embark-which-key-indicator embark-indicators)))
+          (apply fn args)))
+
+    (advice-add #'embark-completing-read-prompter
+                :around #'embark-hide-which-key-indicator)
+    )
+
+  (use-package consult
+    :general
+    (leader
+     "fr"  'consult-recent-file
+     ;; "bm"  'consult-buffer
+     "fL"  'consult-locate))
+
+  (use-package embark-consult
+    :after (embark consult)
+    :hook (embark-collect-mode . consult-preview-at-point-mode))
+
+  (use-package corfu
+    :ensure t
+    :custom
+    (corfu-cycle t) ;; allows cycling through candidates
+    (corfu-auto t) ;; disables auto-completion
+    (corfu-quit-at-boundary nil) ;; needed to use orderless completion with corfu
+    :init
+    (global-corfu-mode)
+    :config
+    (general-def :keymaps 'corfu-map
+      "C-n" 'corfu-next
+      "C-p" 'corfu-previous))
+
+  (provide 'my-completion)
+#+end_src
+
+* the org-mode configurations (=my-org.el=)
+
+** org-journal (get prepared for org-capture) 
+
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package org-journal
+    :init
+    ;; Change default prefix key; needs to be set before loading org-journal
+    ;; (setq org-journal-prefix-key "C-c j ")
+    (setq org-journal-dir my-journal-dir)
+    :config
+
+    (setq org-journal-file-type 'monthly)
+    (setq org-journal-file-format "%Y/month%m.org" ;;"%Y%m%d.org" "%Y/month%m-week%V.org"
+          org-journal-date-format "%b %e %Y (%A)"
+          org-journal-time-format ""
+          org-journal-start-on-weekday '7)
+
+    (defun my/org-journal-file-header-func (time)
+      "Custom function to create journal header."
+      (concat
+       (pcase org-journal-file-type
+         ;; (`daily "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
+         ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+         (`weekly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes\nWeekly Goals [%]\nRESEARCH:\n- [ ] \nCOURSES:\n- [ ] \nSERVICE:\n- [ ] \nOTHERS:\n- [ ] \n\n")
+         (`monthly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes")
+         ;; (`yearly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
+         )))
+
+    (setq org-journal-file-header 'my/org-journal-file-header-func)
+
+    ;; (defun get-journal-file-today ()
+    ;;   "Gets filename for today's journal entry."
+    ;;   (let ((daily-name (format-time-string "%Y%m")))
+    ;;     (expand-file-name (concat org-journal-dir daily-name ".org"))))
+
+    ;; (defun journal-file-today ()
+    ;;   "Creates and load a journal file based on today's date."
+    ;;   (interactive)
+    ;;   (find-file (get-journal-file-today)))
+
+    (defun journal-file-today ()
+      "Creates and load a journal file based on today's date."
+      (interactive)
+      (org-journal-open-current-journal-file))
+  )
+#+end_src
+
+** org-mode config skeleton
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes :noweb no-export
+  (use-package org
+    :mode ("\\.org\\'" . org-mode)
+    :init
+    (defun my-org-mode-hooks ()
+      (visual-line-mode)
+      (display-line-numbers-mode t)
+      (flyspell-mode)
+      (outline-minor-mode)
+      (electric-pair-mode 0)
+      ;; (electric-pair-mode) ;; has to be disabled other wise \( ... \) cannot be paired properly
+      )
+    :general
+    <<org-keymaps>>
+    :general-config
+    <<org-keymaps-config>>
+    :config
+    <<org-general>>
+    <<org-help-fcns>>
+    <<org-capture>>
+    <<org-refile>>
+    <<org-agenda>>
+    )
+#+end_src
+
+** org-mode general settings
+#+name: org-general
+#+begin_src emacs-lisp :tangle no
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
+          (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
+          (sequence "NEXT(n)" "INPROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
+
+  ;; extend today for late sleepers
+  ;; (setq org-extend-today-until 2)
+  ;; Add time stamp and note to the task when it's done
+  (setq org-log-done 'time)
+  ;; Insert state change notes and time stamps into a drawer
+  (setq org-log-into-drawer t)
+  ;; use user preferred labels
+  (setq org-latex-prefer-user-labels t)
+  ;; Downscale image size
+  ;; Source: https://emacs.stackexchange.com/questions/26363/downscaling-inline-images-in-org-mode
+  (setq org-image-actual-width nil)
+  ;; Add the REPORT drawer
+  (setq org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT"))
+
+  ;; Start week on Sunday (not following the ISO standard)
+  (setq org-agenda-start-on-weekday 0)
+
+  ;; control where the todo popup appears
+  ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
+  (setq org-use-fast-todo-selection 'expert)
+
+
+  ;; https://stackoverflow.com/questions/17239273/org-mode-buffer-latex-syntax-highlighting
+  (setq org-highlight-latex-and-related '(latex script entities))
+
+  ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+  ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
+  (setq org-latex-with-hyperref nil)
+
+  (setq org-emphasis-alist
+        '(("*" (bold :foreground "Orange" ))
+          ("/" italic)
+          ("_" underline)
+          ("=" (:background "maroon" :foreground "white"))
+          ("~" (:background "deep sky blue" :foreground "MidnightBlue"))))
+
+  (add-to-list 'org-modules 'org-tempo t)
+
+  ;; for ledger integration into orgmode
+  (add-to-list 'org-babel-load-languages '(ledger . t))
+
+  (setq org-structure-template-alist
+    '(("lem" . "lemma")
+      ("thm" . "theorem")
+      ("cor" . "corollary")
+      ("rmk" . "remark")
+      ("prf" . "proof")
+      ("prop" . "proposition")
+      ("prob" . "problem")
+      ("clm" . "claim")
+      ("sol" . "solution")
+      ("def" . "definition")
+      ("emp" . "example")
+      ("ltx" . "export latex")
+      ("ledger" . "src ledger :noweb yes")
+      ("el" . "src emacs-lisp")
+      ("sh" . "src sh")
+      ("src" . "src")
+      ("exp" . "export")))
+
+  (define-skeleton org-latex-header
+    "Header info for literature notes."
+    "Inserting header for literature notes."
+    "#+DATE: \n"
+    "#+AUTHOR: Haoming Shen\n"
+    "#+OPTIONS: author:nil date:nil title:nil toc:nil \n"
+    "#+LaTeX_CLASS: notes \n"
+    "#+LaTeX_HEADER: \\addbibresource{master.bib} \n"
+   )
+
+  (define-skeleton org-header
+    "Header info for org notes."
+    "Inserting header for org notes."
+    "#+DATE: \n"
+    "#+AUTHOR: Haoming Shen\n"
+   )
+
+  (define-skeleton org-latex-attr
+    "Attributes for LaTeX segments"
+    "Inserting attributes for LaTeX environment."
+    "#+ATTR_LaTeX: :options []"
+    )
+#+end_src
+
+** org-mode helpful functions
+
+Source: https://koenig-haunstetten.de/2018/02/17/improving-my-orgmode-workflow/
+
+source: https://www.reddit.com/r/orgmode/comments/11rfh5r/anyone_knows_how_to_quickly_change_math_from_to/
+
+#+name: org-help-fcns
+#+begin_src emacs-lisp :tangle no
+  (defun my/copy-idlink-to-clipboard()
+     "Copy an ID link with the headline to killring, if no ID is there then create a new unique ID. This function works only in org-mode or org-agenda buffers. The purpose of this function is to easily construct id:-links to org-mode items. If its assigned to a key it saves you marking the text and copying to the killring."
+        (interactive)
+        (when (eq major-mode 'org-agenda-mode) ;switch to orgmode
+      (org-agenda-show)
+      (org-agenda-goto))
+        (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+      (setq mytmphead (nth 4 (org-heading-components)))
+          (setq mytmpid (funcall 'org-id-get-create))
+      (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+      (kill-new mytmplink)
+      (message "Copied %s to killring (clipboard)" mytmplink)))
+
+  (defun my/tex-canvasify ()
+    (interactive)
+    (save-excursion
+      (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max))))
+
+  (defun my/tex-uncanvasify ()
+      (interactive)
+      (save-excursion
+        (replace-regexp "\\\\\(.*?\)\\\\)" "\\$\\\1\\\$" nil (point-min) (point-max))))
+
+#+end_src
+
+** org-mode keymaps
+
+#+name: org-keymaps
+#+begin_src emacs-lisp :tangle no
+  (defun my/open-agenda (&optional arg)
+    "Open org-agenda directly"
+    (interactive "p")
+    (org-agenda arg "a"))
+  (defun my/open-diary ()
+    "Open org-diary directly"
+    (interactive) ;; (find-file org-my-diary)
+    (journal-file-today))
+  (defun my/open-inbox ()
+    "Open inbox directly"
+    (interactive)
+    (find-file my-org-inbox))
+  (defun my/open-gtd ()
+    "Open org-my-gtd directly"
+    (interactive)
+    (find-file my-org-gtd))
+  (defun my/open-projects ()
+    "Open org-research directly"
+    (interactive)
+    (find-file my-org-projects))
+  (defun my/open-readings ()
+    "Open org-readings directly"
+    (interactive)
+    (find-file my-org-reading))
+
+  (leader
+    "oa"  'my/open-agenda
+    "od"  'my/open-diary
+    "oi"  'my/open-inbox
+    "od"  'my/open-gtd
+    "op"  'my/open-projects
+    "or"  'my/open-readings
+    "ot"  'org-todo-list)
+#+end_src
+
+#+name: org-keymaps-config
+#+begin_src emacs-lisp :tangle no
+  (general-def org-mode-map
+    "C-0" (lambda () (interactive) (org-latex-export-to-pdf t))
+    "C-9" (lambda () (interactive) (org-beamer-export-to-pdf t))
+    "C-<f9>" 'org-toggle-pretty-entities
+    "C-<f10>" 'org-latex-preview)
+  (general-def org-agenda-mode-map
+    "<f10>" 'my/copy-idlink-to-clipboard)
+#+end_src
+
+** org-mode capture
+
+#+name: org-capture
+#+begin_src emacs-lisp :tangle no
+  (setq org-capture-bookmark nil)
+
+  (defun my/org-journal-find-location ()
+     ;; Open today's journal, but specify a non-nil prefix argument in order to
+     ;; inhibit inserting the heading; org-capture will insert the heading.
+     (org-journal-new-date-entry t)
+     (unless (eq org-journal-file-type 'daily)
+       (org-narrow-to-subtree))
+     (goto-char (point-max)))
+
+  (setq org-capture-templates
+          '(("t" "Todo [inbox]" entry
+             (file+headline org-my-inbox "Tasks") "* TODO %i")
+            ;; ("T" "Tickler" entry
+            ;;  (file+headline "~/Dropbox/Org/tickler.org" "Tickler") "* %i%? \n %U")
+            ("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
+             "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+             :immediate-finish t
+             :jump-to-captured t)
+            ("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
+             "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+             :immediate-finish t
+             :jump-to-captured t
+             )
+            ;; ("d" "Daily Tasks in Journal" entry (file+datetree+prompt org-my-diary)
+            ;;  "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+            ;;  :tree-type week
+            ;;  :immediate-finish t
+            ;;  :jump-to-captured t
+            ;;  )
+             ("l" "Ledger entries")
+            ("lC" "Chase CSP" plain
+                     (file my-ledger)
+                     "%(org-read-date) * %^{Payee}
+      Expenses:%^{Category}:%^{Details}  %^{Amount}
+      Liabilities:Chase:SapphirePreferred
+    ")
+            ("lF" "Chase Freedom" plain
+                     (file my-ledger)
+                     "%(org-read-date) * %^{Payee}
+      Expenses:%^{Category}:%^{Details}  %^{Amount}
+      Liabilities:Chase:FreedomUnlimited
+    ")
+            ("lB" "Amex BlueCash" plain
+                     (file my-ledger)
+                     "%(org-read-date) * %^{Payee}
+      Expenses:%^{Category}:%^{Details}  %^{Amount}
+      Liabilities:Amex:BlueCash
+    ")
+            ("A" "Anki entries")))
+
+#+end_src
+
+** org-mode refile
+
+#+name: org-refile
+#+begin_src emacs-lisp :tangle no
+  ;; refile configs
+  (defun my/opened-buffer-files ()
+      "Return the list of files currently opened in emacs"
+      (delq nil
+  	(mapcar (lambda (x)
+  		(if (and (buffer-file-name x)
+  			    (string-match "\\.org$"
+  					(buffer-file-name x)))
+  		    (buffer-file-name x)))
+  		(buffer-list))))
+
+  (setq org-refile-targets '((my-org-gtd :maxlevel . 3)
+  			(my-org-projects :maxlevel . 3)
+  			(my-org-reading :maxlevel . 3)
+  			(my-org-proposals :maxlevel . 3)
+  			(my-org-teaching :maxlevel . 3)
+  			(my-org-misc :maxlevel . 3)
+  			(my/opened-buffer-files :maxlevel . 9)))
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps t)
+#+end_src
+
+** org-mode agenda
+
+#+name: org-agenda
+#+begin_src emacs-lisp :tangle no
+  (setq org-directory (list my-org-dir))
+  (setq org-agenda-files
+        (list
+         my-org-inbox
+         my-org-gtd
+         my-org-misc
+         my-org-projects
+         my-org-teaching
+         my-org-reading
+         my-org-proposals))
+
+  (setq org-archive-location my-org-archive)
+#+end_src
+** org-mode latex
+
+#+name: org-latex
+#+begin_src emacs-lisp :tangle no
+  (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
+  (setq org-e-latex-tables-booktabs t)
+  (setq org-latex-pdf-process
+      '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
+  (setq org-latex-packages-alist
+      (quote (("" "parskip" t)
+  	    ("" "amsmath" t)
+  	    ("" "amssymb" t)
+  	    ("" "amsthm" t)
+  	    ("" "amsfonts" t)
+  	    ("" "mathtools" t)
+  	    ("" "braket" t)
+  	    ("" "booktabs" t)
+  	    ("" "bbm" t)
+  	    ("" "listings" t)
+  	    ("" "algorithm2e" t)
+  	    ("" "xcolor" t)
+  	    ("" "mymacros" t))))
+  (add-to-list 'org-latex-classes
+  	       '("notes"
+  		"\\documentclass[11pt]{article}
+  \\usepackage[normalem]{ulem}
+  \\usepackage{booktabs}
+  \\usepackage[inline, shortlabels]{enumitem}
+  \\usepackage[backref=true,natbib=true,maxbibnames=99,doi=false,url=false,giveninits=true]{biblatex}
+  \\usepackage{hyperref}
+  \\usepackage{mynotes}
+  \\usepackage{mymacros}
+  [NO-DEFAULT-PACKAGES]
+  [NO-PACKAGES]
+  %%%% configs
+  \\DefineBibliographyStrings{english}{backrefpage={page}, backrefpages={pages}}
+  \\setlength\\parindent{0pt}
+  \\setitemize{itemsep=1pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+  	    '("manuscripts"
+  	    "\\documentclass[11pt]{article}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  \\usepackage[margin=1in]{geometry}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{pgf,interval}
+  \\usepackage{booktabs}
+  \\usepackage[inline]{enumitem}
+  \\usepackage[backref=true,natbib=true,maxbibnames=99,doi=false,url=false,giveninits=true,dashed=false]{biblatex}
+  \\usepackage{hyperref}
+  %%%% configs
+  \\DefineBibliographyStrings{english}{backrefpage={page}, backrefpages={pages}}
+  \\intervalconfig{soft open fences}
+  \\setlength\\parindent{0pt}
+  \\setitemize{itemsep=1pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+  	    '("slides"
+  		"\\documentclass[notheorems]{beamer}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{booktabs}
+  \\usepackage[natbib=true,backend=biber,style=authoryear-icomp,maxbibnames=1,maxcitenames=2,uniquelist=false,doi=false,isbn=false,url=false,eprint=false,dashed=false]{biblatex}
+  \\usepackage{pgfpages}
+  %%%% configs
+  \\setlength\\parindent{0pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+  	    '("moderncv"
+  	    "\\documentclass{moderncv}
+  [NO-DEFAULT-PACKAGES]
+  [NO-PACKAGES]"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (add-to-list 'org-latex-classes
+  	     '("annual report"
+  		"\\documentclass{article}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{booktabs}
+  \\usepackage[inline]{enumitem}
+  \\usepackage{hyperref}
+  "
+  		("\\section{%s}" . "\\section*{%s}")
+  		("\\subsection{%s}" . "\\subsection*{%s}")
+  		("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+#+end_src
+** org-mode super agenda
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package org-super-agenda
+    :after org-agenda
+    :init
+    (setq org-super-agenda-groups
+         '(;; Each group has an implicit boolean OR operator between its selectors.
+           (:name "Today"  ; Optionally specify section name
+                  :time-grid t  ; Items that appear on the time grid
+                  :todo "TODAY")  ; Items that have this TODO keyword
+           (:name "Important"
+                  ;; Single arguments given alone
+                  :tag "Projects"
+                  :deadline today
+                  :priority "A")
+           (:name "Overdue"
+                  :deadline past)
+           (:name "Due soon"
+                  :deadline future)
+           (:name "To read"
+                  :tag "Papers")
+           (:name "Personal"
+                  :habit t)
+           (:name "Less Important"
+                  :priority<= "B"
+                  :order 7)
+           (:todo ("WAITING" "LATER")
+                  :order 8)
+           (:name "Not Urgent"
+                  :todo "TODO"
+                  :order 9)))
+    (setq org-agenda-skip-scheduled-if-done t
+          org-agenda-skip-deadline-if-done t
+          org-agenda-include-deadlines t
+          org-agenda-block-separator t
+          org-agenda-tags-column 100 ;; from testing this seems to be a good value
+          org-agenda-compact-blocks t)
+    :config
+    (org-super-agenda-mode))
+#+end_src
+** my-org provider
+
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+(provide 'my-org)
+#+end_src
+
+* The latex configurations (=my-latex.el=)
+** auctex 
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package auctex
+    :no-require t
+    ;; :hook (LaTeX-mode . visual-fill-column-mode)
+    ;; :hook (LaTeX-mode . olivetti-mode)
+    :mode ("\\.tex\\'" . LaTeX-mode)
+    :init
+    (setq TeX-parse-self t ; parse on load
+          TeX-auto-save t  ; parse on save
+          TeX-source-correlate-mode t
+          TeX-source-correlate-method 'synctex
+          TeX-source-correlate-start-server nil
+          TeX-electric-sub-and-superscript t
+          TeX-engine 'xetex ;; use xelatex by default
+          TeX-save-query nil)
+
+    (setq TeX-view-program-list
+          '(("PDF Tools" TeX-pdf-tools-sync-view)
+            ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+            ("preview-pane" latex-preview-pane-mode)))
+
+    (setq TeX-view-program-selection
+          '((output-pdf "PDF Tools")
+            (output-pdf "Skim")
+            (output-dvi "open")
+            (output-pdf "open")
+            (output-html "open")
+            (output-pdf "preview-pane")))
+    )
+#+end_src
+
+** tex
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package tex
+    :straight auctex
+    :config
+    (defun my-LaTeX-mode-hooks ()
+      (latex-electric-env-pair-mode)
+      (whitespace-mode)
+      (show-paren-mode)
+      (visual-line-mode)
+      (flyspell-mode)
+      (outline-minor-mode)
+      (display-line-numbers-mode t)
+      (TeX-source-correlate-mode t)
+      (prettify-symbols-mode))
+    (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
+    (add-hook 'TeX-after-compilation-finished-functions
+                #'TeX-revert-document-buffer)
+    (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
+
+    ;; (setq TeX-electric-math (cons "\\(" "\\)"))
+    (setq LaTeX-electric-left-right-brace t)
+    (setq prettify-symbols-unprettify-at-point 'right-edge)
+    (setq TeX-command-default "LaTeXmk")
+    (local-leader LaTeX-mode-map
+      "p" 'preview-at-point
+      "m" 'TeX-command-master
+      "c" 'TeX-command-run-all
+      "v" 'TeX-view
+      )
+  )
+
+  (use-package evil-tex
+    :hook (LaTeX-mode . evil-tex-mode))
+#+end_src
+
+** cdlatex
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package cdlatex
+    :init
+    (setq cdlatex-takeover-parenthesis nil)
+    :hook
+    (LaTeX-mode . turn-on-cdlatex)
+    (org-mode   . turn-on-org-cdlatex)
+    :diminish
+    :config
+    ;; (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
+    (setq cdlatex-use-dollar-to-ensure-math nil)
+    ;; (setq cdlatex-paired-parens "$([{|")
+    (setq cdlatex-math-symbol-alist
+          '(
+            (?0 ("\\varnothing" "\\emptyset" ""))
+            (?{ ("\\min" "\\inf" ""))
+            (?} ("\\max" "\\sup" ""))
+            (?< ("\\subseteq" "\\subset" ""))
+            (?> ("\\supseteq" "\\supset" ""))
+            (?D  ("\\Delta" "\\nabla" "\\displaystyle"))
+            (?f ("\\phi" "\\varphi" ""))
+            (?F ("\\Phi" "" ""))
+            (?I ("\\int\\limits" "" ""))
+            (?: ("\\colon" "" ""))
+            (?H ("\\hop" "" ""))
+            (?T ("\\top" "" ""))
+            )
+          cdlatex-math-modify-alist
+          '(
+            (?b "\\bm" nil t nil nil)
+            (?B "\\mathbb" nil t nil nil)
+            (?n "\\norm" nil t nil nil)
+            (?a "\\abs" nil t nil nil)
+            (?- "\\overline" nil t nil nil)
+            (?0 "\\text" nil t nil nil)))
+
+    (setq cdlatex-env-alist
+          '(
+            ("axiom" "\\begin{axiom}\n?\n\\end{axiom}\n" nil)
+            ("proof" "\\begin{proof}\n?\n\\end{proof}\n" nil)
+            ("lemma" "\\begin{lemma}\n?\n\\end{lemma}\n" nil)
+            ("theorem" "\\begin{theorem}\n?\n\\end{theorem}\n" nil)
+            ("corollary" "\\begin{corollary}\n?\n\\end{corollary}\n" nil)
+            ("proposition" "\\begin{proposition}\n\n\\end{proposition}\n" nil)
+            ("problem" "\\begin{problem}\n?\n\\end{problem}\n" nil)
+            ("solution" "\\begin{solution}\n?\n\\end{solution}\n" nil)
+            ("remark" "\\begin{remark}\n?\n\\end{remark}\n" nil)
+            ("comment" "\\begin{comment}\n?\n\\end{comment}\n" nil)
+            ("aligned" "\\begin{aligned}\n?\n\\end{aligned}\n" nil)
+            ("figure" "\\begin{figure}[!htbp]\n\\centering\n\\includegraphics[width=\\textwidth]{AUTOFILE}\n\\caption{AUTOLABEL ?}\n\\end{figure}" nil)
+            ("frame" "\\begin{frame}\n\\frametitle{?}\n\\end{frame}\n" nil)
+            ("frtwcl" "\\begin{frame}\n\\frametitle{?}\n\\begin{columns}\n\\begin{column}{0.5\\textwidth}\n\n\\end{column}\n\\begin{column}{0.5\\textwidth}\n\n\\end{column}\n\\end{columns}\n\\end{frame}\n" nil)
+            ("twcl" "\\begin{columns}\n\\begin{column}{0.5\\textwidth}\n\n\\end{column}\n\\begin{column}{0.5\\textwidth}\n\n\\end{column}\n\\end{columns}" nil)
+            ("comment box" "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n% ?\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", nil)
+            )
+          cdlatex-command-alist
+          '(
+            ("cmtb" "Insert Comment Box" "" cdlatex-environment ("comment box") t nil)
+            ("Set" "Insert \\Set{}" "\\Set{?}" cdlatex-position-cursor nil nil t)
+            ("set" "Insert \\set{}" "\\set{?}" cdlatex-position-cursor nil nil t)
+            ("para" "Insert \\paragraph{}" "\\paragraph{?}" cdlatex-position-cursor nil t nil)
+            ("inprod" "Insert \\inprod{}{}" "\\inprod{?}{}" cdlatex-position-cursor nil nil t)
+            ("non" "Insert \\nonumber\\\\" "\\nonumber\\\\\n" nil nil nil t)
+            ("alid" "Insert aligned env" "" cdlatex-environment ("aligned") t nil)
+            ("axm" "Insert axiom env" "" cdlatex-environment ("axiom") t nil)
+            ("thm" "Insert theorem env" "" cdlatex-environment ("theorem") t nil)
+            ("lem" "Insert lemma env" "" cdlatex-environment ("lemma") t nil)
+            ("cor" "Insert corollary env" "" cdlatex-environment ("corollary") t nil)
+            ("prop" "Insert proposition env" "" cdlatex-environment ("proposition") t nil)
+            ;; ("prob" "Insert problem env" "" cdlatex-environment ("problem") t nil)
+            ("sol" "Insert solution env" "" cdlatex-environment ("solution") t nil)
+            ("cmt" "Insert comment env" "" cdlatex-environment ("comment") t nil)
+            ("rmk" "Insert remark env" "" cdlatex-environment ("remark") t nil)
+            ("frm" "Insert frame env" "" cdlatex-environment ("frame") t nil)
+            ("frtwcl" "Insert two columned frame env" "" cdlatex-environment ("frtwcl") t nil)
+            ("twcl" "Insert two columns env" "" cdlatex-environment ("twcl") t nil))
+          )
+
+    :general-config
+    (general-def
+     :states '(normal insert)
+     :keymaps '(cdlatex-mode-map org-mode-map)
+     "M-;" 'cdlatex-tab)
+    )
+#+end_src
+
+** bibtex 
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))
+  (defvar my-pdf-library '("~/Dropbox/10-Resources/Papers/pdfs"))
+  (defvar my-notes '("~/Dropbox/10-Resources/Papers/notes"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package citar
+    :config
+    (setq citar-bibliography (symbol-value 'my-bib-files))
+    (setq citar-library-paths (symbol-value 'my-pdf-library))
+    (setq citar-notes-paths (symbol-value 'my-notes))
+    (setq org-cite-csl-styles-dir (expand-file-name "~/Dropbox/50-Software/Zotero/styles"))
+    (setq citar-symbol-separator " ")
+    (setq citar-symbols
+     `((file "⌘" . " ") (note "✎" . " ") (link "⚓" . " ")))
+    (setq citar-at-point-function 'embark-act)
+    (setq citar-templates
+  	'((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
+  	  (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
+  	  (preview . "${author::%etal} (${date year issued:4}) ${title}\n")
+  	  (default-preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+  	  (note . "Notes on ${author editor:%etal}, ${title}")))
+
+    (with-eval-after-load 'oc
+      (setq org-cite-insert-processor 'citar)
+      (setq org-cite-follow-processor 'citar)
+      (setq org-cite-activate-processor 'citar)
+      (setq org-cite-global-bibliography citar-bibliography)
+    )
+
+    ;; taken from citar wiki, doesn't yet work because file-name-concat is missing
+
+
+    ;; (defun citar--add-file-to-library (key)
+    ;;   "Add a file to the library for KEY.
+    ;; The FILE can be added either from an open buffer, a file, or a
+    ;; URL."
+    ;;   (let* ((source
+    ;;           (char-to-string
+    ;;            (read-char-choice
+    ;;             "Add file from [b]uffer, [f]ile, or [u]rl? " '(?b ?f ?u))))
+    ;;          (directory (if (cdr citar-library-paths)
+    ;;                         (completing-read "Directory: " citar-library-paths)
+    ;;                       (car citar-library-paths)))
+    ;;          (file-path
+    ;;           (file-name-concat directory (concat key ".pdf")))) ; FIX so don't hardcode extension
+    ;;     (pcase source
+    ;;       ("b"
+    ;;        (with-current-buffer (read-buffer-to-switch "Add file buffer: ")
+    ;;          (write-file file-path)))
+    ;;       ("f"
+    ;;        (copy-file
+    ;;         (expand-file-name
+    ;;          (read-file-name "Add file: " nil nil t)) file-path))
+    ;;       ("u"
+    ;;        (url-copy-file (read-string "Add file URL: ") file-path)))))
+
+    ;; (defun citar-add-file-to-library (key-entry)
+    ;;   "Add a file to the library for KEY-ENTRY.
+    ;; The FILE can be added either from an open buffer, a file, or a
+    ;; URL."
+    ;;   (interactive (list (citar-select-ref
+    ;;                       :rebuild-cache current-prefix-arg)))
+    ;;    (citar--add-file-to-library (car key-entry)))
+
+    :general ;; use :general to activate a mode
+    ;; :general-config ;; use :general-config when the mode is activated
+
+    (leader
+      "ab"  'citar-open)
+    (local-leader
+      :keymaps '(org-mode-map LaTeX-mode-map)
+      "b"  '(:ignore t :which-key "bibliography")
+      "bb" 'citar-open
+      "bi" 'citar-insert-citation
+      "br" 'citar-insert-reference
+      "bk" 'citar-insert-keys
+      "bn" 'citar-open-notes
+      "bo" 'citar-open-files
+      "bl" 'citar-open-links
+      ;; "c"  'citar-insert-citation
+      )
+    )
+#+end_src
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package biblio
+    :general-config
+    (local-leader bibtex-mode-map
+      "i" 'biblio-doi-insert-bibtex))
+
+  (use-package bibtex-utils
+    :hook (bibtex-mode . load-bibtex-utils)
+    ;; :magic ("%bib" . load-bibtex-utils)
+    ;; :mode ("\\.bib\\'" . load-bibtex-utils)
+    :commands bu-jump-to-doc
+    :config
+    (defun load-bibtex-utils ()
+      (progn
+        (require 'bibtex-utils)
+        (my-bibtex-mode-hooks)))
+    (defun my-bibtex-mode-hooks ()
+      (auto-fill-mode 0)
+      (display-line-numbers-mode 1))
+    (setq bu-pdf-dir (symbol-value 'my-pdf-library)
+          bibtex-autokey-titlewords 2
+          bibtex-autokey-titlewords-stretch 0
+          bibtex-autokey-names-stretch 1
+          bibtex-autokey-year-title-separator "_"
+          bibtex-maintain-sorted-entries t)
+
+    :general
+
+    (general-def '(normal insert visual emacs) bibtex-mode-map
+      "C-n"  'bu-next-entry
+      "C-p"  'bu-previous-entry
+      )
+    (local-leader bibtex-mode-map
+      "o" 'bu-open-doc
+      "K" 'bu-make-field-keywords
+      "c" 'bibtex-clean-entry)
+
+    (local-leader
+      :keymaps '(LaTeX-mode-map)
+      "o" 'bu-jump-to-doc))
+#+end_src
+
+** reftex
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package reftex
+    :straight (:type built-in)
+    :config
+    (add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
+    (setq reftex-plug-into-AUCTeX t
+        reftex-default-bibliography (symbol-value 'my-bib-files))
+    ;; (local-leader LaTeX-mode-map
+    ;;     "r"   'reftex-reference)
+  )
+#+end_src
+
+** pdf-tools
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+  (use-package pdf-tools
+    :magic ("%PDF" . pdf-view-mode)
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+  )
+#+end_src
+
+** my-latex provider
+
+#+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
+(provide 'my-latex)
+#+end_src
+
+* The coding environment (=my-code.el=)
+
+#+begin_src emacs-lisp :tangle "modules/my-code.el" :mkdirp yes
+  (defun my-prog-mode-hook ()
+    ;; (auto-fill-mode)
+    (show-paren-mode)
+    (whitespace-mode)
+    (electric-pair-mode)
+    (flymake-mode)
+    (display-line-numbers-mode))
+  (add-hook 'prog-mode-hook 'my-prog-mode-hook)
+
+  (use-package yapfify
+    :hook (python-mode . yapf-mode))
+
+  (use-package julia-mode
+    :mode ("\\.jl\\'" . julia-mode))
+
+  ;; (use-package web-mode
+  ;;   :mode ("\\.html\\'" . web-mode)
+  ;;   :config
+  ;;   (setq web-mode-enable-current-column-highlight t))
+
+  (use-package emmet-mode
+    :hook (web-mode  . emmet-mode)
+          (css-mode  . emmet-mode))
+
+  (use-package markdown-mode
+    :defer t
+    :ensure t
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "modules/my-code.el" :mkdirp yes
+  (defun my-prog-mode-hook ()
+    ;; (auto-fill-mode)
+    (show-paren-mode)
+    (whitespace-mode)
+    (electric-pair-mode)
+    (flymake-mode)
+    (display-line-numbers-mode))
+  (add-hook 'prog-mode-hook 'my-prog-mode-hook)
+
+  (use-package yapfify
+    :hook (python-mode . yapf-mode))
+
+  (use-package julia-mode
+    :mode ("\\.jl\\'" . julia-mode))
+
+  ;; (use-package web-mode
+  ;;   :mode ("\\.html\\'" . web-mode)
+  ;;   :config
+  ;;   (setq web-mode-enable-current-column-highlight t))
+
+  (use-package emmet-mode
+    :hook (web-mode  . emmet-mode)
+          (css-mode  . emmet-mode))
+
+  (use-package markdown-mode
+    :defer t
+    :ensure t
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "modules/my-code.el" :mkdirp yes
+(provide 'my-code)
+#+end_src
+
+* The version control configs (=my-vc.el=)
+
+#+begin_src emacs-lisp :tangle "modules/my-vc.el" :mkdirp yes
+  (use-package magit
+    :commands (magit-status)
+    :general
+    (leader
+     "g"   '(:ignore t :which-key "git")
+     "gg"  'magit-status))
+  (provide 'my-vc)
+#+end_src
+
+
+
+
+
+
+
+

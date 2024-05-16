@@ -21,10 +21,81 @@
    "oa"  'org-agenda
    "ot"  'org-todo-list)
   :config
+
+  (setq org-todo-keywords
+          '((sequence "TODO(t)" "|" "DONE(d)")
+            (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
+            (sequence "NEXT(n)" "INPROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
+
   (setq org-confirm-babel-evaluate nil
-        org-src-fontify-natively t)
+        org-src-fontify-natively t
+	org-log-done 'time
+	org-log-into-drawer t
+	org-latex-prefer-user-labels t
+	;; Downscale image size
+	;; Source: https://emacs.stackexchange.com/questions/26363/downscaling-inline-images-in-org-mode
+	org-image-actual-width nil
+	org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT")
+	org-agenda-start-on-weekday 0
+        ;; https://stackoverflow.com/questions/17239273/org-mode-buffer-latex-syntax-highlighting
+	org-highlight-latex-and-related '(latex script entities)
+        ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
+	org-latex-with-hyperref nil)
+
+  (setq org-emphasis-alist
+	'(("*" (bold :foreground "Orange" ))
+	  ("/" italic)
+	  ("_" underline)
+	  ("=" (:background "maroon" :foreground "white"))
+	  ("~" (:background "deep sky blue" :foreground "MidnightBlue"))))
+
+  (add-to-list 'org-babel-load-languages '(ledger . t))
 
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+
+  (setq org-structure-template-alist
+	'(("lem" . "lemma")
+	  ("thm" . "theorem")
+	  ("cor" . "corollary")
+	  ("rmk" . "remark")
+	  ("prf" . "proof")
+          ("prop" . "proposition")
+          ("prob" . "problem")
+          ("clm" . "claim")
+          ("sol" . "solution")
+          ("def" . "definition")
+          ("emp" . "example")
+          ("ltx" . "export latex")
+          ("ledger" . "src ledger :noweb yes")
+          ("el" . "src emacs-lisp")
+          ("sh" . "src sh")
+          ("src" . "src")
+          ("exp" . "export")))
+
+  (define-skeleton org-latex-header
+    "Header info for literature notes."
+    "Inserting header for literature notes."
+    "#+DATE: \n"
+    "#+AUTHOR: Haoming Shen\n"
+    "#+OPTIONS: author:nil date:nil title:nil toc:nil \n"
+    "#+LaTeX_CLASS: notes \n"
+    "#+LaTeX_HEADER: \\addbibresource{master.bib} \n"
+   )
+
+  (define-skeleton org-header
+    "Header info for org notes."
+    "Inserting header for org notes."
+    "#+DATE: \n"
+    "#+AUTHOR: Haoming Shen\n"
+   )
+
+  (define-skeleton org-latex-attr
+    "Attributes for LaTeX segments"
+    "Inserting attributes for LaTeX environment."
+    "#+ATTR_LaTeX: :options []"
+    )
+
+  (setq org-id-locations-file "~/.config/emacs/.org-id-locations")
 
   (defun org-babel-execute-and-next ()
     (interactive)

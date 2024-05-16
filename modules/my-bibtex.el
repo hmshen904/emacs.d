@@ -68,11 +68,11 @@
   ;;                       :rebuild-cache current-prefix-arg)))
   ;;    (citar--add-file-to-library (car key-entry)))
 
-  :general
+  :general ;; use :general to activate a mode
+  ;; :general-config ;; use :general-config when the mode is activated
+
   (leader
     "ab"  'citar-open)
-
-  :general-config
   (local-leader
     :keymaps '(org-mode-map LaTeX-mode-map)
     "b"  '(:ignore t :which-key "bibliography")
@@ -112,7 +112,8 @@
         bibtex-autokey-year-title-separator "_"
         bibtex-maintain-sorted-entries t)
 
-  :general-config
+  :general
+
   (general-def '(normal insert visual emacs) bibtex-mode-map
     "C-n"  'bu-next-entry
     "C-p"  'bu-previous-entry

@@ -1,9 +1,3 @@
-;;; my-completion.el --- My completion for Emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-;;; Emacs Startup File --- my completion for Emacs
-;;; Package --- Summary
-;;; Code:
-
 (use-package vertico
   :init
   (setq vertico-cycle t)
@@ -103,4 +97,3 @@
     "C-p" 'corfu-previous))
 
 (provide 'my-completion)
-;;; my-completion ends here

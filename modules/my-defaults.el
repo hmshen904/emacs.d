@@ -1,11 +1,3 @@
-;;; my-defaults.el --- My defaults for Emacs  -*- lexical-binding: t; -*-
-;;; Commentary:
-;;; Emacs Startup File --- my defaults for Emacs
-;;; Package --- Summary
-;;; Code:
-
-;; (use-package delight)
-
 (use-package emacs
   :init
   ;; sigh
@@ -19,6 +11,16 @@
 
   ; toggle wrapping text at the 80th character
   (setq fill-column 80)
+  (setq-default word-wrap t)
+
+  ; turn off alarm
+  (setq ring-bell-function 'ignore)
+
+  ; disable scroll bar
+  (scroll-bar-mode -1)
+
+  ; do not display splash screen on startup
+  (setq inhibit-splash-screen t)
 
   ; redisplay never recenters cursor
   (setq scroll-conservatively 101)
@@ -81,6 +83,7 @@
   (blink-cursor-mode 0)
   (recentf-mode 1)
   (show-paren-mode t)
+  (flymake-mode -1)
 
   ;; set_this
   ;; (setq initial-scratch-message
@@ -90,9 +93,23 @@
 
   :delight
   (auto-fill-function " AF")
-  (visual-line-mode)
+  (visual-line-mode))
 
-  )
+(use-package diminish)
+
+(setq my-config-dir "~/.config/emacs")
+(setq my-org-dir "~/Dropbox/Org")
+
+(setq my-config-path (concat (file-name-as-directory my-config-dir) "config.org"))
+(setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
+(setq my-journal-dir (concat (file-name-as-directory my-org-dir) "journal"))
+(setq my-org-inbox (concat (file-name-as-directory my-org-dir) "inbox.org"))
+(setq my-org-gtd (concat (file-name-as-directory my-org-dir) "gtd.org"))
+(setq my-org-projects (concat (file-name-as-directory my-org-dir) "projects.org"))
+(setq my-org-reading (concat (file-name-as-directory my-org-dir) "readings.org"))
+(setq my-org-proposals (concat (file-name-as-directory my-org-dir) "proposals.org"))
+(setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
+(setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
+(setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
 
 (provide 'my-defaults)
-;;; my-defaults ends here
