@@ -78,7 +78,8 @@
     "C-9" (lambda () (interactive) (org-beamer-export-to-pdf t))
     "C-<f9>" 'org-toggle-pretty-entities
     "C-<f10>" 'org-latex-preview)
-  (general-def org-agenda-mode-map
+  
+  (general-def '(org-mode-map org-agenda-mode-map)
     "<f10>" 'my/copy-idlink-to-clipboard)
   
   (local-leader
