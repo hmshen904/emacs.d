@@ -209,7 +209,7 @@
     ;; Org mode
 
     "oi"  'my/open-inbox
-    "od"  'my/open-gtd
+    "og"  'my/open-gtd
     "op"  'my/open-projects
     "or"  'my/open-readings
 
