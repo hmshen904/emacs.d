@@ -100,7 +100,7 @@
 (setq my-config-dir "~/.config/emacs")
 (setq my-org-dir "~/Dropbox/Org")
 
-(setq my-config-path (concat (file-name-as-directory my-config-dir) "config.org"))
+(setq my-config-file (concat (file-name-as-directory my-config-dir) "config.org"))
 (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
 (setq my-journal-dir (concat (file-name-as-directory my-org-dir) "journal"))
 (setq my-org-inbox (concat (file-name-as-directory my-org-dir) "inbox.org"))

@@ -7,4 +7,3 @@
 (require 'my-latex)
 (require 'my-code)
 (require 'my-vc)
-(switch-to-buffer "*scratch*")

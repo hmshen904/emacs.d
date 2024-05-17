@@ -56,25 +56,25 @@
     "Open org-agenda directly"
     (interactive "p")
     (org-agenda arg "a"))
+  
   (defun my/open-diary ()
     "Open org-diary directly"
-    (interactive) ;; (find-file org-my-diary)
     (journal-file-today))
+  
   (defun my/open-inbox ()
     "Open inbox directly"
-    (interactive)
     (find-file my-org-inbox))
+  
   (defun my/open-gtd ()
     "Open org-my-gtd directly"
-    (interactive)
     (find-file my-org-gtd))
+  
   (defun my/open-projects ()
     "Open org-research directly"
-    (interactive)
     (find-file my-org-projects))
+  
   (defun my/open-readings ()
     "Open org-readings directly"
-    (interactive)
     (find-file my-org-reading))
   
   (leader
@@ -84,7 +84,11 @@
     "od"  'my/open-gtd
     "op"  'my/open-projects
     "or"  'my/open-readings
-    "ot"  'org-todo-list)
+    "ot"  'org-babel-tangle
+  
+    "X"   'org-capture
+    )
+  
   :general-config
   (general-def org-mode-map
     "C-0" (lambda () (interactive) (org-latex-export-to-pdf t))
@@ -93,6 +97,13 @@
     "C-<f10>" 'org-latex-preview)
   (general-def org-agenda-mode-map
     "<f10>" 'my/copy-idlink-to-clipboard)
+  
+  (local-leader
+    :keymaps 'org-mode-map
+    "r"  '(:ignore t :which-key "org-refile")
+    "rr" 'org-refile
+    "rc" 'org-refile-copy
+    )
   :config
   (setq org-todo-keywords
         '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
@@ -114,7 +125,11 @@
   (setq org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT"))
   
   ;; Start week on Sunday (not following the ISO standard)
-  (setq org-agenda-start-on-weekday 0)
+  (setq org-agenda-start-on-weekday 7)
+  
+  ;; use mm-dd-yyyy
+  (setq org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>"))
+  (setq org-display-custom-times t)
   
   ;; control where the todo popup appears
   ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
@@ -125,13 +140,13 @@
   (setq org-highlight-latex-and-related '(latex script entities))
   
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
-  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
   
   (setq org-emphasis-alist
-        '(("*" (bold :foreground "Orange" ))
+        '(("*" (bold :foreground "Blue" ))
           ("/" italic)
           ("_" underline)
           ("=" (:background "maroon" :foreground "white"))
@@ -216,46 +231,87 @@
        (org-narrow-to-subtree))
      (goto-char (point-max)))
   
-  (setq org-capture-templates
-          '(("t" "Todo [inbox]" entry
-             (file+headline org-my-inbox "Tasks") "* TODO %i")
-            ;; ("T" "Tickler" entry
-            ;;  (file+headline "~/Dropbox/Org/tickler.org" "Tickler") "* %i%? \n %U")
-            ("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-             "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-             :immediate-finish t
-             :jump-to-captured t)
-            ("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-             "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
-             :immediate-finish t
-             :jump-to-captured t
-             )
-            ;; ("d" "Daily Tasks in Journal" entry (file+datetree+prompt org-my-diary)
-            ;;  "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-            ;;  :tree-type week
-            ;;  :immediate-finish t
-            ;;  :jump-to-captured t
-            ;;  )
-             ("l" "Ledger entries")
-            ("lC" "Chase CSP" plain
-                     (file my-ledger)
-                     "%(org-read-date) * %^{Payee}
-      Expenses:%^{Category}:%^{Details}  %^{Amount}
-      Liabilities:Chase:SapphirePreferred
-    ")
-            ("lF" "Chase Freedom" plain
-                     (file my-ledger)
-                     "%(org-read-date) * %^{Payee}
-      Expenses:%^{Category}:%^{Details}  %^{Amount}
-      Liabilities:Chase:FreedomUnlimited
-    ")
-            ("lB" "Amex BlueCash" plain
-                     (file my-ledger)
-                     "%(org-read-date) * %^{Payee}
-      Expenses:%^{Category}:%^{Details}  %^{Amount}
-      Liabilities:Amex:BlueCash
-    ")
-            ("A" "Anki entries")))
+  ;; init an empty list
+  (setq org-capture-templates nil)
+  ;; push values into it
+  (add-to-list 'org-capture-templates
+  	     '("t" "Todo [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* TODO %i"))
+  
+  (add-to-list 'org-capture-templates
+  	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
+  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  	       :immediate-finish t
+  	       :jump-to-captured t))
+  
+  (add-to-list 'org-capture-templates
+  	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
+  	       "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	       :immediate-finish t
+  	       :jump-to-captured t))
+  
+  (add-to-list 'org-capture-templates
+  	     '("p" "Proposal to write [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{PROPOSAL TITLE} [%]
+    :PROPERTIES:
+    :COOKIE_DATA: todo recursive
+    :END:\n** TODO [%\\1] Prep. the budget form\n** TODO [%\\1] Literature Review [%]\n** TODO [%\\1] Proposal Writing [%]\n** TODO [%\\1] Supplementary Doc Prep. [%]"))
+  
+  (add-to-list 'org-capture-templates
+  	     '("r" "Research project to think [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{PROJECT TITLE} [%]
+    :PROPERTIES:
+    :COOKIE_DATA: todo recursive
+    :END:\n** TODO [%\\1] Literature review [%]\n** TODO [%\\1] Research questions [%]\n** TODO [%\\1] Paper writing [%]"))
+  
+  (add-to-list 'org-capture-templates
+  	     '("R" "Paper/Proposal to review [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{TITLE} [%]
+    :PROPERTIES:
+    :COOKIE_DATA: todo recursive
+    :END:\n** TODO [%\\1] Submission overview\n** TODO [%\\1] Submission evaluation[%]\n** TODO [%\\1] Review letter writing [%]"))
+  
+  
+  ;; (setq org-capture-templates
+  ;;         '(("t" "Todo [inbox]" entry
+  ;;            (file+headline org-my-inbox "Tasks") "* TODO %i")
+  ;;           ;; ("T" "Tickler" entry
+  ;;           ;;  (file+headline "~/Dropbox/Org/tickler.org" "Tickler") "* %i%? \n %U")
+  ;;           ("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
+  ;;            "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  ;;            :immediate-finish t
+  ;;            :jump-to-captured t)
+  ;;           ("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
+  ;;            "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  ;;            :immediate-finish t
+  ;;            :jump-to-captured t
+  ;;            )
+  ;;           ;; ("d" "Daily Tasks in Journal" entry (file+datetree+prompt org-my-diary)
+  ;;           ;;  "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  ;;           ;;  :tree-type week
+  ;;           ;;  :immediate-finish t
+  ;;           ;;  :jump-to-captured t
+  ;;           ;;  )
+  ;;            ("l" "Ledger entries")
+  ;;           ("lC" "Chase CSP" plain
+  ;;                    (file my-ledger)
+  ;;                    "%(org-read-date) * %^{Payee}
+  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
+  ;;     Liabilities:Chase:SapphirePreferred
+  ;;   ")
+  ;;           ("lF" "Chase Freedom" plain
+  ;;                    (file my-ledger)
+  ;;                    "%(org-read-date) * %^{Payee}
+  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
+  ;;     Liabilities:Chase:FreedomUnlimited
+  ;;   ")
+  ;;           ("lB" "Amex BlueCash" plain
+  ;;                    (file my-ledger)
+  ;;                    "%(org-read-date) * %^{Payee}
+  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
+  ;;     Liabilities:Amex:BlueCash
+  ;;   ")
+  ;;           ("A" "Anki entries")))
   
   ;; refile configs
   (defun my/opened-buffer-files ()

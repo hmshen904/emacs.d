@@ -176,8 +176,8 @@
     "f"   '(:ignore t :which-key "files")
     "fc"  'write-file
     "fe"  '(:ignore t :which-key "emacs")
-    "fei" 'find-user-init-file
     "fed" 'open-user-config-dir
+    "fec" 'find-user-config-file
     "feR" 'load-user-init-file
     "fd"  'dired
     "fb"  'bookmark-bmenu-list
