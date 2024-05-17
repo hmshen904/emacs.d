@@ -97,6 +97,26 @@
     (interactive)
     (shell-command "open ."))
 
+  (defun my/open-inbox ()
+    (interactive)
+    "Open inbox directly"
+    (find-file my-org-inbox))
+
+  (defun my/open-gtd ()
+    (interactive)
+    "Open org-my-gtd directly"
+    (find-file my-org-gtd))
+
+  (defun my/open-projects ()
+    (interactive)
+    "Open org-research directly"
+    (find-file my-org-projects))
+
+  (defun my/open-readings ()
+    (interactive)
+    "Open org-readings directly"
+    (find-file my-org-reading))
+
   ;;Taken from http://emacsredux.com/blog/2013/05/04/rename-file-and-buffer/
   (defun rename-file-and-buffer ()
     "Rename the current buffer and file it is visiting."
@@ -185,6 +205,13 @@
     "fl"  'find-file-literally
     "fR"  'rename-file-and-buffer
     "fs"  'save-buffer
+
+    ;; Org mode
+
+    "oi"  'my/open-inbox
+    "od"  'my/open-gtd
+    "op"  'my/open-projects
+    "or"  'my/open-readings
 
     ;; Applications
     ":"   'shell-command

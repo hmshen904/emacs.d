@@ -3,6 +3,7 @@
   ;; Change default prefix key; needs to be set before loading org-journal
   ;; (setq org-journal-prefix-key "C-c j ")
   (setq org-journal-dir my-journal-dir)
+
   :config
 
   (setq org-journal-file-type 'monthly)
@@ -38,6 +39,14 @@
     "Creates and load a journal file based on today's date."
     (interactive)
     (org-journal-open-current-journal-file))
+
+  (defun my/open-diary ()
+    (interactive)
+    "Open org-diary directly"
+    (journal-file-today))
+
+  (leader
+    "od" 'my/open-diary)
 )
 
 (use-package org
@@ -57,34 +66,8 @@
     (interactive "p")
     (org-agenda arg "a"))
   
-  (defun my/open-diary ()
-    "Open org-diary directly"
-    (journal-file-today))
-  
-  (defun my/open-inbox ()
-    "Open inbox directly"
-    (find-file my-org-inbox))
-  
-  (defun my/open-gtd ()
-    "Open org-my-gtd directly"
-    (find-file my-org-gtd))
-  
-  (defun my/open-projects ()
-    "Open org-research directly"
-    (find-file my-org-projects))
-  
-  (defun my/open-readings ()
-    "Open org-readings directly"
-    (find-file my-org-reading))
-  
   (leader
     "oa"  'my/open-agenda
-    "od"  'my/open-diary
-    "oi"  'my/open-inbox
-    "od"  'my/open-gtd
-    "op"  'my/open-projects
-    "or"  'my/open-readings
-    "ot"  'org-babel-tangle
   
     "X"   'org-capture
     )
