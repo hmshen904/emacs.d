@@ -989,6 +989,8 @@ source: https://www.reddit.com/r/orgmode/comments/11rfh5r/anyone_knows_how_to_qu
 
 ** org-mode capture
 
+https://orgmode.org/manual/Template-expansion.html#Template-expansion
+
 #+name: org-capture
 #+begin_src emacs-lisp :tangle no
   (setq org-capture-bookmark nil)
