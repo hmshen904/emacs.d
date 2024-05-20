@@ -46,7 +46,7 @@
     (journal-file-today))
 
   (leader
-    "od" 'my/open-diary)
+    "nd" 'my/open-diary)
 )
 
 (use-package org
@@ -57,9 +57,11 @@
     (display-line-numbers-mode t)
     (flyspell-mode)
     (outline-minor-mode)
-    (electric-pair-mode 0)
+    (electric-pair-mode -1)
     ;; (electric-pair-mode) ;; has to be disabled other wise \( ... \) cannot be paired properly
     )
+  ;; (my-org-mode-hooks)
+  :hook (org-mode . my-org-mode-hooks)
   :general
   (defun my/open-agenda (&optional arg)
     "Open org-agenda directly"
@@ -67,7 +69,7 @@
     (org-agenda arg "a"))
   
   (leader
-    "oa"  'my/open-agenda
+    "na"  'my/open-agenda
   
     "X"   'org-capture
     )
@@ -107,6 +109,8 @@
   (setq org-image-actual-width nil)
   ;; Add the REPORT drawer
   (setq org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT"))
+  
+  (setq org-return-follows-link  t)
   
   ;; Start week on Sunday (not following the ISO standard)
   (setq org-agenda-start-on-weekday 7)
@@ -368,5 +372,7 @@
         org-agenda-compact-blocks t)
   :config
   (org-super-agenda-mode))
+
+
 
 (provide 'my-org)

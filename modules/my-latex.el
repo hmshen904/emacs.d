@@ -144,16 +144,16 @@
    "M-;" 'cdlatex-tab)
   )
 
-(defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))
-(defvar my-pdf-library '("~/Dropbox/10-Resources/Papers/pdfs"))
-(defvar my-notes '("~/Dropbox/10-Resources/Papers/notes"))
+;; (defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))
+;; (defvar my-pdf-library '("~/Dropbox/10-Resources/Papers/pdfs"))
+;; (defvar my-notes '("~/Dropbox/10-Resources/Papers/notes"))
 
 (use-package citar
   :config
   (setq citar-bibliography (symbol-value 'my-bib-files))
   (setq citar-library-paths (symbol-value 'my-pdf-library))
   (setq citar-notes-paths (symbol-value 'my-notes))
-  (setq org-cite-csl-styles-dir (expand-file-name "~/Dropbox/50-Software/Zotero/styles"))
+  (setq org-cite-csl-styles-dir my-cite-csl-styles-dir)
   (setq citar-symbol-separator " ")
   (setq citar-symbols
    `((file "⌘" . " ") (note "✎" . " ") (link "⚓" . " ")))

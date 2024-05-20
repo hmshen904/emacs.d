@@ -208,10 +208,11 @@
 
     ;; Org mode
 
-    "oi"  'my/open-inbox
-    "og"  'my/open-gtd
-    "op"  'my/open-projects
-    "or"  'my/open-readings
+    "n"   '(:ignore t :which-key "notes")
+    "ni"  'my/open-inbox
+    "ng"  'my/open-gtd
+    "np"  'my/open-projects
+    "nr"  'my/open-readings
 
     ;; Applications
     ":"   'shell-command
