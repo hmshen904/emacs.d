@@ -107,6 +107,11 @@
     "Open org-my-gtd directly"
     (find-file my-org-gtd))
 
+  (defun my/open-roam-index ()
+    (interactive)
+    "Open my-org-roam-index directly"
+    (find-file my-org-roam-index))
+
   (defun my/open-projects ()
     (interactive)
     "Open org-research directly"
@@ -209,10 +214,11 @@
     ;; Org mode
 
     "n"   '(:ignore t :which-key "notes")
-    "ni"  'my/open-inbox
-    "ng"  'my/open-gtd
-    "np"  'my/open-projects
-    "nr"  'my/open-readings
+    "nI"  'my/open-inbox
+    "nG"  'my/open-gtd
+    "nP"  'my/open-projects
+    "nR"  'my/open-readings
+    "nr"  'my/open-roam-index
 
     ;; Applications
     ":"   'shell-command

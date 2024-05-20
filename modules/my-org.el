@@ -54,12 +54,8 @@
   :init
   (defun my-org-mode-hooks ()
     (visual-line-mode)
-    (display-line-numbers-mode t)
-    (flyspell-mode)
     (outline-minor-mode)
-    (electric-pair-mode -1)
-    ;; (electric-pair-mode) ;; has to be disabled other wise \( ... \) cannot be paired properly
-    )
+    (electric-pair-mode -1)) ;; electric-pair-mode has to be disabled other wise \( ... \) cannot be paired properly
   ;; (my-org-mode-hooks)
   :hook (org-mode . my-org-mode-hooks)
   :general
@@ -69,7 +65,7 @@
     (org-agenda arg "a"))
   
   (leader
-    "na"  'my/open-agenda
+    "nA"  'my/open-agenda
   
     "X"   'org-capture
     )
@@ -373,6 +369,38 @@
   :config
   (org-super-agenda-mode))
 
+(use-package org-roam
+  :custom
+  (org-roam-directory (file-truename my-org-roam-dir))
+  (org-roam-completion-everywhere t)
+  :config
+  (setq org-roam-node-display-template
+	(concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (setq org-roam-capture-templates
+	'(("d" "default" plain "%?"
+	   :target (file+head "%<%Y%m%d%H%M>-${slug}.org"
+                          "#+TITLE: ${title}\n#+DATE: \n#+AUTHOR: Haoming Shen \n#+OPTIONS: author:nil date:nil title:nil toc:nil\n#+LaTeX_CLASS: notes\n#+LaTeX_HEADER: \\addbibresource{master.bib}")
+       :unnarrowed t)))
+  (org-roam-db-autosync-mode)
+  (require 'org-roam-protocol)
 
+  :general
+
+  (leader
+    "nf" 'org-roam-node-find
+    "ni" 'org-roam-node-insert
+    ))
+
+(use-package citar-org-roam
+  :after (citar org-roam)
+  :config (citar-org-roam-mode)
+  (setq citar-org-roam-note-title-template "${author} - ${title}")
+  (add-to-list 'org-roam-capture-templates
+               '("n" "literature note" plain "%?"
+                 :target
+                 (file+head
+                  "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
+                  "#+title: ${citar-citekey} (${citar-date}). ${note-title}.\n#+created: %U\n#+last_modified: %U\n\n")
+                 :unnarrowed t)))
 
 (provide 'my-org)

@@ -95,13 +95,12 @@
   (auto-fill-function " AF")
   (visual-line-mode))
 
-(use-package diminish)
-
 (setq my-config-dir "~/.config/emacs")
-(setq my-org-dir "~/Dropbox/Org")
-(setq my-tex-local-path "~/Dropbox/40-Scripts/texmf/tex/latex/local")
-(setq my-paper-dir "~/Dropbox/10-Resources/Papers")
-(setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/50-Software/Zotero/styles"))
+(setq my-org-dir "~/Dropbox/org")
+(setq my-tex-local-path "~/Dropbox/50-scripts/texmf/tex/latex/local")
+(setq my-paper-dir "~/Dropbox/14-papers")
+(setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/55-software/Zotero/styles"))
+(setq my-org-roam-dir "~/Dropbox/13-notes/roam")
 
 (setq my-config-file (concat (file-name-as-directory my-config-dir) "config.org"))
 (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
@@ -114,9 +113,12 @@
 (setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
 (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
 (setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
+(setq my-org-roam-index (concat (file-name-as-directory my-org-roam-dir) "index.org"))
 
 (setq my-bib-files (concat (file-name-as-directory my-tex-local-path) "master.bib"))
 (setq my-pdf-library (concat (file-name-as-directory my-paper-dir) "pdfs"))
 (setq my-notes (concat (file-name-as-directory my-paper-dir) "notes"))
+
+(use-package diminish)
 
 (provide 'my-defaults)

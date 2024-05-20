@@ -187,20 +187,15 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     (visual-line-mode))
 #+end_src
 
-** diminisher
-
-#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
-  (use-package diminish)
-#+end_src
-
 ** paths
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
   (setq my-config-dir "~/.config/emacs")
-  (setq my-org-dir "~/Dropbox/Org")
-  (setq my-tex-local-path "~/Dropbox/40-Scripts/texmf/tex/latex/local")
-  (setq my-paper-dir "~/Dropbox/10-Resources/Papers")
-  (setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/50-Software/Zotero/styles"))
+  (setq my-org-dir "~/Dropbox/org")
+  (setq my-tex-local-path "~/Dropbox/50-scripts/texmf/tex/latex/local")
+  (setq my-paper-dir "~/Dropbox/14-papers")
+  (setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/55-software/Zotero/styles"))
+  (setq my-org-roam-dir "~/Dropbox/13-notes/roam")
 
   (setq my-config-file (concat (file-name-as-directory my-config-dir) "config.org"))
   (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
@@ -213,10 +208,17 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   (setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
   (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
   (setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
+  (setq my-org-roam-index (concat (file-name-as-directory my-org-roam-dir) "index.org"))
 
   (setq my-bib-files (concat (file-name-as-directory my-tex-local-path) "master.bib"))
   (setq my-pdf-library (concat (file-name-as-directory my-paper-dir) "pdfs"))
   (setq my-notes (concat (file-name-as-directory my-paper-dir) "notes"))
+#+end_src
+
+** diminisher
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (use-package diminish)
 #+end_src
 
 ** my-defaults provider
@@ -366,6 +368,11 @@ From a stylistic perspective (completely personal preference) I:
       "Open org-my-gtd directly"
       (find-file my-org-gtd))
 
+    (defun my/open-roam-index ()
+      (interactive)
+      "Open my-org-roam-index directly"
+      (find-file my-org-roam-index))
+
     (defun my/open-projects ()
       (interactive)
       "Open org-research directly"
@@ -468,10 +475,11 @@ From a stylistic perspective (completely personal preference) I:
       ;; Org mode
 
       "n"   '(:ignore t :which-key "notes")
-      "ni"  'my/open-inbox
-      "ng"  'my/open-gtd
-      "np"  'my/open-projects
-      "nr"  'my/open-readings
+      "nI"  'my/open-inbox
+      "nG"  'my/open-gtd
+      "nP"  'my/open-projects
+      "nR"  'my/open-readings
+      "nr"  'my/open-roam-index
 
       ;; Applications
       ":"   'shell-command
@@ -819,12 +827,8 @@ From a stylistic perspective (completely personal preference) I:
     :init
     (defun my-org-mode-hooks ()
       (visual-line-mode)
-      (display-line-numbers-mode t)
-      (flyspell-mode)
       (outline-minor-mode)
-      (electric-pair-mode -1)
-      ;; (electric-pair-mode) ;; has to be disabled other wise \( ... \) cannot be paired properly
-      )
+      (electric-pair-mode -1)) ;; electric-pair-mode has to be disabled other wise \( ... \) cannot be paired properly
     ;; (my-org-mode-hooks)
     :hook (org-mode . my-org-mode-hooks)
     :general
@@ -983,7 +987,7 @@ source: https://www.reddit.com/r/orgmode/comments/11rfh5r/anyone_knows_how_to_qu
     (org-agenda arg "a"))
 
   (leader
-    "na"  'my/open-agenda
+    "nA"  'my/open-agenda
 
     "X"   'org-capture
     )
@@ -1300,14 +1304,46 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 #+end_src
 ** org-roam
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package org-roam
+    :custom
+    (org-roam-directory (file-truename my-org-roam-dir))
+    (org-roam-completion-everywhere t)
+    :config
+    (setq org-roam-node-display-template
+  	(concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (setq org-roam-capture-templates
+  	'(("d" "default" plain "%?"
+  	   :target (file+head "%<%Y%m%d%H%M>-${slug}.org"
+                            "#+TITLE: ${title}\n#+DATE: \n#+AUTHOR: Haoming Shen \n#+OPTIONS: author:nil date:nil title:nil toc:nil\n#+LaTeX_CLASS: notes\n#+LaTeX_HEADER: \\addbibresource{master.bib}")
+         :unnarrowed t)))
+    (org-roam-db-autosync-mode)
+    (require 'org-roam-protocol)
 
+    :general
+
+    (leader
+      "nf" 'org-roam-node-find
+      "ni" 'org-roam-node-insert
+      ))
 #+end_src
 
+** org-roam-citar
 
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
-
+  (use-package citar-org-roam
+    :after (citar org-roam)
+    :config (citar-org-roam-mode)
+    (setq citar-org-roam-note-title-template "${author} - ${title}")
+    (add-to-list 'org-roam-capture-templates
+                 '("n" "literature note" plain "%?"
+                   :target
+                   (file+head
+                    "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
+                    "#+title: ${citar-citekey} (${citar-date}). ${note-title}.\n#+created: %U\n#+last_modified: %U\n\n")
+                   :unnarrowed t)))
 #+end_src
+
 
 ** my-org provider
 
@@ -1641,7 +1677,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     ;; (auto-fill-mode)
     (show-paren-mode)
     (whitespace-mode)
-    (electric-pair-mode)
+    (electric-pair-mode -1)
     (flymake-mode)
     (display-line-numbers-mode))
   (add-hook 'prog-mode-hook 'my-prog-mode-hook)
@@ -1676,7 +1712,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     ;; (auto-fill-mode)
     (show-paren-mode)
     (whitespace-mode)
-    (electric-pair-mode)
+    (electric-pair-mode -1)
     (flymake-mode)
     (display-line-numbers-mode))
   (add-hook 'prog-mode-hook 'my-prog-mode-hook)
