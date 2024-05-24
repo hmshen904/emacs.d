@@ -214,11 +214,11 @@
     ;; Org mode
 
     "n"   '(:ignore t :which-key "notes")
-    "nI"  'my/open-inbox
-    "nG"  'my/open-gtd
-    "nP"  'my/open-projects
-    "nR"  'my/open-readings
-    "nr"  'my/open-roam-index
+    "ni"  'my/open-inbox
+    "ng"  'my/open-gtd
+    "np"  'my/open-projects
+    "nr"  'my/open-readings
+    "nn"  'my/open-roam-index
 
     ;; Applications
     ":"   'shell-command

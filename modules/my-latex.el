@@ -150,9 +150,9 @@
 
 (use-package citar
   :config
-  (setq citar-bibliography (symbol-value 'my-bib-files))
-  (setq citar-library-paths (symbol-value 'my-pdf-library))
-  (setq citar-notes-paths (symbol-value 'my-notes))
+  (setq citar-bibliography (list my-bib-files))
+  (setq citar-library-paths (list my-pdf-library))
+  (setq citar-notes-paths (list my-notes))
   (setq org-cite-csl-styles-dir my-cite-csl-styles-dir)
   (setq citar-symbol-separator " ")
   (setq citar-symbols

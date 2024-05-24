@@ -475,11 +475,11 @@ From a stylistic perspective (completely personal preference) I:
       ;; Org mode
 
       "n"   '(:ignore t :which-key "notes")
-      "nI"  'my/open-inbox
-      "nG"  'my/open-gtd
-      "nP"  'my/open-projects
-      "nR"  'my/open-readings
-      "nr"  'my/open-roam-index
+      "ni"  'my/open-inbox
+      "ng"  'my/open-gtd
+      "np"  'my/open-projects
+      "nr"  'my/open-readings
+      "nn"  'my/open-roam-index
 
       ;; Applications
       ":"   'shell-command
@@ -987,7 +987,7 @@ source: https://www.reddit.com/r/orgmode/comments/11rfh5r/anyone_knows_how_to_qu
     (org-agenda arg "a"))
 
   (leader
-    "nA"  'my/open-agenda
+    "na"  'my/open-agenda
 
     "X"   'org-capture
     )
@@ -1005,8 +1005,20 @@ source: https://www.reddit.com/r/orgmode/comments/11rfh5r/anyone_knows_how_to_qu
   (general-def '(org-mode-map org-agenda-mode-map)
     "<f10>" 'my/copy-idlink-to-clipboard)
 
+  (general-def
+    :states 'motion
+    :keymaps '(org-mode-map org-agenda-mode-map)
+    "RET" 'org-return
+    )
+
   (local-leader
     :keymaps 'org-mode-map
+    "t"  '(:ignore t :which-key "org-entry")
+    "ta" 'org-archive-subtree
+    "tP" 'org-set-property
+    "tp" 'org-priority
+    "tt" 'org-todo
+
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
     "rc" 'org-refile-copy
@@ -1038,7 +1050,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
   	       :immediate-finish t
   	       :jump-to-captured t))
 
@@ -1068,49 +1080,6 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
     :END:\n** TODO [%\\1] Submission overview\n** TODO [%\\1] Submission evaluation[%]\n** TODO [%\\1] Review letter writing [%]"))
-
-
-  ;; (setq org-capture-templates
-  ;;         '(("t" "Todo [inbox]" entry
-  ;;            (file+headline org-my-inbox "Tasks") "* TODO %i")
-  ;;           ;; ("T" "Tickler" entry
-  ;;           ;;  (file+headline "~/Dropbox/Org/tickler.org" "Tickler") "* %i%? \n %U")
-  ;;           ("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  ;;            "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-  ;;            :immediate-finish t
-  ;;            :jump-to-captured t)
-  ;;           ("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  ;;            "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
-  ;;            :immediate-finish t
-  ;;            :jump-to-captured t
-  ;;            )
-  ;;           ;; ("d" "Daily Tasks in Journal" entry (file+datetree+prompt org-my-diary)
-  ;;           ;;  "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-  ;;           ;;  :tree-type week
-  ;;           ;;  :immediate-finish t
-  ;;           ;;  :jump-to-captured t
-  ;;           ;;  )
-  ;;            ("l" "Ledger entries")
-  ;;           ("lC" "Chase CSP" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Chase:SapphirePreferred
-  ;;   ")
-  ;;           ("lF" "Chase Freedom" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Chase:FreedomUnlimited
-  ;;   ")
-  ;;           ("lB" "Amex BlueCash" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Amex:BlueCash
-  ;;   ")
-  ;;           ("A" "Anki entries")))
-
 #+end_src
 
 ** org-mode refile
@@ -1344,7 +1313,6 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
                    :unnarrowed t)))
 #+end_src
 
-
 ** my-org provider
 
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
@@ -1520,9 +1488,9 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
   (use-package citar
     :config
-    (setq citar-bibliography (symbol-value 'my-bib-files))
-    (setq citar-library-paths (symbol-value 'my-pdf-library))
-    (setq citar-notes-paths (symbol-value 'my-notes))
+    (setq citar-bibliography (list my-bib-files))
+    (setq citar-library-paths (list my-pdf-library))
+    (setq citar-notes-paths (list my-notes))
     (setq org-cite-csl-styles-dir my-cite-csl-styles-dir)
     (setq citar-symbol-separator " ")
     (setq citar-symbols

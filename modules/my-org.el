@@ -65,7 +65,7 @@
     (org-agenda arg "a"))
   
   (leader
-    "nA"  'my/open-agenda
+    "na"  'my/open-agenda
   
     "X"   'org-capture
     )
@@ -80,8 +80,20 @@
   (general-def '(org-mode-map org-agenda-mode-map)
     "<f10>" 'my/copy-idlink-to-clipboard)
   
+  (general-def
+    :states 'motion
+    :keymaps '(org-mode-map org-agenda-mode-map)
+    "RET" 'org-return
+    )
+  
   (local-leader
     :keymaps 'org-mode-map
+    "t"  '(:ignore t :which-key "org-entry")
+    "ta" 'org-archive-subtree
+    "tP" 'org-set-property
+    "tp" 'org-priority
+    "tt" 'org-todo
+  
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
     "rc" 'org-refile-copy
@@ -224,7 +236,7 @@
   
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
   	       :immediate-finish t
   	       :jump-to-captured t))
   
@@ -254,49 +266,6 @@
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
     :END:\n** TODO [%\\1] Submission overview\n** TODO [%\\1] Submission evaluation[%]\n** TODO [%\\1] Review letter writing [%]"))
-  
-  
-  ;; (setq org-capture-templates
-  ;;         '(("t" "Todo [inbox]" entry
-  ;;            (file+headline org-my-inbox "Tasks") "* TODO %i")
-  ;;           ;; ("T" "Tickler" entry
-  ;;           ;;  (file+headline "~/Dropbox/Org/tickler.org" "Tickler") "* %i%? \n %U")
-  ;;           ("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  ;;            "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Anki my Memory. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-  ;;            :immediate-finish t
-  ;;            :jump-to-captured t)
-  ;;           ("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  ;;            "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
-  ;;            :immediate-finish t
-  ;;            :jump-to-captured t
-  ;;            )
-  ;;           ;; ("d" "Daily Tasks in Journal" entry (file+datetree+prompt org-my-diary)
-  ;;           ;;  "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
-  ;;           ;;  :tree-type week
-  ;;           ;;  :immediate-finish t
-  ;;           ;;  :jump-to-captured t
-  ;;           ;;  )
-  ;;            ("l" "Ledger entries")
-  ;;           ("lC" "Chase CSP" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Chase:SapphirePreferred
-  ;;   ")
-  ;;           ("lF" "Chase Freedom" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Chase:FreedomUnlimited
-  ;;   ")
-  ;;           ("lB" "Amex BlueCash" plain
-  ;;                    (file my-ledger)
-  ;;                    "%(org-read-date) * %^{Payee}
-  ;;     Expenses:%^{Category}:%^{Details}  %^{Amount}
-  ;;     Liabilities:Amex:BlueCash
-  ;;   ")
-  ;;           ("A" "Anki entries")))
-  
   ;; refile configs
   (defun my/opened-buffer-files ()
       "Return the list of files currently opened in emacs"
