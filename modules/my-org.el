@@ -49,6 +49,8 @@
     "nd" 'my/open-diary)
 )
 
+(use-package ox-gfm)
+
 (use-package org
   :mode ("\\.org\\'" . org-mode)
   :init
@@ -99,6 +101,7 @@
     "rc" 'org-refile-copy
     )
   :config
+  (require 'ox-gfm nil t)
   (setq org-todo-keywords
         '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
           (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
@@ -108,13 +111,17 @@
   ;; (setq org-extend-today-until 2)
   ;; Add time stamp and note to the task when it's done
   (setq org-log-done 'time)
+  
   ;; Insert state change notes and time stamps into a drawer
   (setq org-log-into-drawer t)
+  
   ;; use user preferred labels
   (setq org-latex-prefer-user-labels t)
+  
   ;; Downscale image size
   ;; Source: https://emacs.stackexchange.com/questions/26363/downscaling-inline-images-in-org-mode
   (setq org-image-actual-width nil)
+  
   ;; Add the REPORT drawer
   (setq org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT"))
   
@@ -126,6 +133,9 @@
   ;; use mm-dd-yyyy
   (setq org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>"))
   (setq org-display-custom-times t)
+  
+  ;; always indent
+  (setq org-startup-indented t)
   
   ;; control where the todo popup appears
   ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
@@ -168,6 +178,7 @@
       ("ltx" . "export latex")
       ("ledger" . "src ledger :noweb yes")
       ("el" . "src emacs-lisp")
+      ("md" . "src markdown")
       ("sh" . "src sh")
       ("src" . "src")
       ("exp" . "export")))

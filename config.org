@@ -425,7 +425,6 @@ From a stylistic perspective (completely personal preference) I:
       "tn"  'my/cycle-theme
       "tt"  'load-theme
       "tl"  'load-leuven-theme
-      "td"  'load-dichromacy-theme
 
       ;; Quit operations
       "q"	  '(:ignore t :which-key "quit emacs")
@@ -438,12 +437,13 @@ From a stylistic perspective (completely personal preference) I:
       "bk"  'kill-this-buffer
       "bn"  'next-buffer
       "bp"  'previous-buffer
-      "b]"  'next-buffer
-      "b["  'previous-buffer
+      ;; "b]"  'next-buffer
+      ;; "b["  'previous-buffer
       "bq"  'kill-buffer-and-window
       "bR"  'rename-file-and-buffer
       "br"  'revert-buffer
       "bb"  'switch-to-buffer
+      "bi"  'ibuffer
 
       ;; Window operations
       "w"   '(:ignore t :which-key "window")
@@ -820,6 +820,12 @@ From a stylistic perspective (completely personal preference) I:
   )
 #+end_src
 
+** markdown exporter
+
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package ox-gfm)
+#+end_src
+
 ** org-mode config skeleton
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes :noweb no-export
   (use-package org
@@ -836,6 +842,7 @@ From a stylistic perspective (completely personal preference) I:
     :general-config
     <<org-keymaps-config>>
     :config
+    (require 'ox-gfm nil t)
     <<org-general>>
     <<org-help-fcns>>
     <<org-capture>>
@@ -856,13 +863,17 @@ From a stylistic perspective (completely personal preference) I:
   ;; (setq org-extend-today-until 2)
   ;; Add time stamp and note to the task when it's done
   (setq org-log-done 'time)
+
   ;; Insert state change notes and time stamps into a drawer
   (setq org-log-into-drawer t)
+
   ;; use user preferred labels
   (setq org-latex-prefer-user-labels t)
+
   ;; Downscale image size
   ;; Source: https://emacs.stackexchange.com/questions/26363/downscaling-inline-images-in-org-mode
   (setq org-image-actual-width nil)
+
   ;; Add the REPORT drawer
   (setq org-drawers '("PROPERTIES" "CLOCK" "LOGBOOK" "REPORT"))
 
@@ -874,6 +885,9 @@ From a stylistic perspective (completely personal preference) I:
   ;; use mm-dd-yyyy
   (setq org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>"))
   (setq org-display-custom-times t)
+
+  ;; always indent
+  (setq org-startup-indented t)
 
   ;; control where the todo popup appears
   ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
@@ -916,6 +930,7 @@ From a stylistic perspective (completely personal preference) I:
       ("ltx" . "export latex")
       ("ledger" . "src ledger :noweb yes")
       ("el" . "src emacs-lisp")
+      ("md" . "src markdown")
       ("sh" . "src sh")
       ("src" . "src")
       ("exp" . "export")))

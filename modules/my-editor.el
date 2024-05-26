@@ -164,7 +164,6 @@
     "tn"  'my/cycle-theme
     "tt"  'load-theme
     "tl"  'load-leuven-theme
-    "td"  'load-dichromacy-theme
 
     ;; Quit operations
     "q"	  '(:ignore t :which-key "quit emacs")
@@ -177,12 +176,13 @@
     "bk"  'kill-this-buffer
     "bn"  'next-buffer
     "bp"  'previous-buffer
-    "b]"  'next-buffer
-    "b["  'previous-buffer
+    ;; "b]"  'next-buffer
+    ;; "b["  'previous-buffer
     "bq"  'kill-buffer-and-window
     "bR"  'rename-file-and-buffer
     "br"  'revert-buffer
     "bb"  'switch-to-buffer
+    "bi"  'ibuffer
 
     ;; Window operations
     "w"   '(:ignore t :which-key "window")
