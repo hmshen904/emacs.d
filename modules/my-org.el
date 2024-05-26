@@ -289,14 +289,17 @@
   		(buffer-list))))
   
   (setq org-refile-targets '((my-org-gtd :maxlevel . 3)
-  			(my-org-projects :maxlevel . 3)
-  			(my-org-reading :maxlevel . 3)
-  			(my-org-proposals :maxlevel . 3)
-  			(my-org-teaching :maxlevel . 3)
-  			(my-org-misc :maxlevel . 3)
-  			(my/opened-buffer-files :maxlevel . 9)))
+  			   (my-org-projects :maxlevel . 3)
+  			   (my-org-reading :maxlevel . 3)
+  			   (my-org-proposals :maxlevel . 3)
+  			   (my-org-teaching :maxlevel . 3)
+  			   (my-org-misc :maxlevel . 3)
+  			   (my/opened-buffer-files :maxlevel . 9)
+  			   )
+        )
   (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps t)
+  (setq org-outline-path-complete-in-steps nil)
+  
   (setq org-directory (list my-org-dir))
   (setq org-agenda-files
         (list
