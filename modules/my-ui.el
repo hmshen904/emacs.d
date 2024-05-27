@@ -35,17 +35,18 @@
   :config
   (mood-line-mode))
 
+
 ;; add padding around mode line
+;; The :style flat-button makes the border have the same color as the background of the mode line.
+;; see https://www.reddit.com/r/emacs/comments/18ktlkg/padding_a_custom_mode_line_with_theme_colour/
 (defun my/pad-mode-line ()
   "pad my mode-line"
   (interactive)
-  (let ((active-bg (face-attribute 'mode-line :background))
-	(inactive-bg (face-attribute 'mode-line-inactive :background)))
-    (custom-set-faces
-     `(mode-line ((t :box (:line-width 4 :color ,active-bg) :background ,active-bg))))))
-
-;; (set-face-attribute 'mode-line nil :box '(:line-width 6))
-;; (set-face-attribute 'mode-line nil  :height 140)
+  (set-face-attribute 'mode-line nil
+		      :box '(:line-width 4 :style flat-button))
+  (set-face-attribute 'mode-line-inactive nil
+		      :box '(:line-width 4 :style flat-button))
+  )
 
 (with-eval-after-load 'general
   (defun disable-all-themes ()
