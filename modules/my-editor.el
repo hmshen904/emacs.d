@@ -107,6 +107,11 @@
     "Open org-my-gtd directly"
     (find-file my-org-gtd))
 
+  (defun my/open-misc ()
+    (interactive)
+    "Open org-my-misc directly"
+    (find-file my-org-misc))
+
   (defun my/open-roam-index ()
     (interactive)
     "Open my-org-roam-index directly"
@@ -150,8 +155,8 @@
 
     ;; jumpers
     "j"   '(:ignore t :which-key "jump")
-    "jl"  'evilem-motion-next-visual-line
-    "jk"  'evilem-motion-previous-visual-line
+    "jn"  'evilem-motion-next-visual-line
+    "jp"  'evilem-motion-previous-visual-line
     "jt"  'evilem-motion-find-char-to
     "jT"  'evilem-motion-find-char-to-backward
     "jf"  'evilem-motion-find-char
@@ -206,6 +211,7 @@
     "feR" 'load-user-init-file
     "fd"  'dired
     "fb"  'bookmark-bmenu-list
+    "fm"  'bookmark-set
     "fj"  'dired-jump
     "fl"  'find-file-literally
     "fR"  'rename-file-and-buffer
@@ -219,6 +225,7 @@
     "np"  'my/open-projects
     "nr"  'my/open-readings
     "nn"  'my/open-roam-index
+    "nh"  'my/open-misc
 
     ;; Applications
     ":"   'shell-command

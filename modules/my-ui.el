@@ -1,3 +1,52 @@
+;; (use-package olivetti
+;;   :diminish
+;;   :commands olivetti-mode
+;;   :config
+;;   (setq olivetti-body-width 120)
+;;   (setq olivetti-minimum-body-width 120))
+
+(use-package visual-fill-column
+  :diminish
+  :commands visual-fill-column-mode
+  :init
+  (add-hook 'prog-mode-hook #'visual-fill-column-mode)
+  (add-hook 'text-mode-hook #'visual-fill-column-mode)
+  (setq visual-fill-column-width 100)
+  ;; :config
+  ;; (visual-fill-column-mode 1)
+)
+
+(use-package hide-mode-line
+  :diminish
+  :config
+  (add-hook 'help-mode-hook #'hide-mode-line-mode))
+
+;; modeline
+;; (use-package doom-modeline
+;;   :init
+;;   (doom-modeline-mode 1)
+;;   :config
+;;   (setq doom-modeline-height 25))
+
+(use-package mood-line
+  ;; Use pretty Fira Code-compatible glyphs
+  :custom
+  (mood-line-glyph-alist mood-line-glyphs-fira-code)
+  :config
+  (mood-line-mode))
+
+;; add padding around mode line
+(defun my/pad-mode-line ()
+  "pad my mode-line"
+  (interactive)
+  (let ((active-bg (face-attribute 'mode-line :background))
+	(inactive-bg (face-attribute 'mode-line-inactive :background)))
+    (custom-set-faces
+     `(mode-line ((t :box (:line-width 4 :color ,active-bg) :background ,active-bg))))))
+
+;; (set-face-attribute 'mode-line nil :box '(:line-width 6))
+;; (set-face-attribute 'mode-line nil  :height 140)
+
 (with-eval-after-load 'general
   (defun disable-all-themes ()
     "disable all active themes."
@@ -16,10 +65,16 @@
     "Cycles through my themes."
     (interactive)
     (setq my/themes-index (% (1+ my/themes-index) (length my/themes)))
-    (my/load-indexed-theme))
+    (my/load-indexed-theme)
+    (my/pad-mode-line))
 
   (defun my/load-indexed-theme ()
     (load-theme (nth my/themes-index my/themes)))
+
+  ;; (defun my/load-theme ()
+  ;;   (interactive)
+  ;;   (load-theme)
+  ;;   (my/pad-mode-line)) 
 
   (leader "t"   '(:ignore t :which-key "themes")
           "tn"  'my/cycle-theme
@@ -74,24 +129,7 @@
       (load-theme 'leuven t)))
 
 (load-anti-zenburn)
-
-(use-package hide-mode-line
-  :diminish
-  :config
-  (add-hook 'help-mode-hook #'hide-mode-line-mode))
-
-;; modeline
-(use-package doom-modeline
-  :init
-  (doom-modeline-mode 1)
-  :config
-  (setq doom-modeline-height 25))
-
-(use-package olivetti
-  :diminish
-  :commands olivetti-mode
-  :config
-  (setq olivetti-body-width 120)
-  (setq olivetti-minimum-body-width 120))
+;; (load-leuven-light)
+(my/pad-mode-line)
 
 (provide 'my-ui)

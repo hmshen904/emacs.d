@@ -106,6 +106,7 @@
 (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
 (setq my-journal-dir (concat (file-name-as-directory my-org-dir) "journal"))
 (setq my-org-inbox (concat (file-name-as-directory my-org-dir) "inbox.org"))
+(setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
 (setq my-org-gtd (concat (file-name-as-directory my-org-dir) "gtd.org"))
 (setq my-org-projects (concat (file-name-as-directory my-org-dir) "projects.org"))
 (setq my-org-reading (concat (file-name-as-directory my-org-dir) "readings.org"))
@@ -119,6 +120,11 @@
 (setq my-pdf-library (concat (file-name-as-directory my-paper-dir) "pdfs"))
 (setq my-notes (concat (file-name-as-directory my-paper-dir) "notes"))
 
+(setq my-init-file my-org-inbox)
+
 (use-package diminish)
+
+(when (file-exists-p my-init-file)
+  (setq initial-buffer-choice my-init-file))
 
 (provide 'my-defaults)

@@ -201,6 +201,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
   (setq my-journal-dir (concat (file-name-as-directory my-org-dir) "journal"))
   (setq my-org-inbox (concat (file-name-as-directory my-org-dir) "inbox.org"))
+  (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
   (setq my-org-gtd (concat (file-name-as-directory my-org-dir) "gtd.org"))
   (setq my-org-projects (concat (file-name-as-directory my-org-dir) "projects.org"))
   (setq my-org-reading (concat (file-name-as-directory my-org-dir) "readings.org"))
@@ -213,12 +214,22 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   (setq my-bib-files (concat (file-name-as-directory my-tex-local-path) "master.bib"))
   (setq my-pdf-library (concat (file-name-as-directory my-paper-dir) "pdfs"))
   (setq my-notes (concat (file-name-as-directory my-paper-dir) "notes"))
+
+  (setq my-init-file my-org-inbox)
 #+end_src
 
 ** diminisher
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
   (use-package diminish)
+#+end_src
+
+** initial buffer
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (when (file-exists-p my-init-file)
+    (setq initial-buffer-choice my-init-file))
+
 #+end_src
 
 ** my-defaults provider
@@ -368,6 +379,11 @@ From a stylistic perspective (completely personal preference) I:
       "Open org-my-gtd directly"
       (find-file my-org-gtd))
 
+    (defun my/open-misc ()
+      (interactive)
+      "Open org-my-misc directly"
+      (find-file my-org-misc))
+
     (defun my/open-roam-index ()
       (interactive)
       "Open my-org-roam-index directly"
@@ -411,8 +427,8 @@ From a stylistic perspective (completely personal preference) I:
 
       ;; jumpers
       "j"   '(:ignore t :which-key "jump")
-      "jl"  'evilem-motion-next-visual-line
-      "jk"  'evilem-motion-previous-visual-line
+      "jn"  'evilem-motion-next-visual-line
+      "jp"  'evilem-motion-previous-visual-line
       "jt"  'evilem-motion-find-char-to
       "jT"  'evilem-motion-find-char-to-backward
       "jf"  'evilem-motion-find-char
@@ -467,6 +483,7 @@ From a stylistic perspective (completely personal preference) I:
       "feR" 'load-user-init-file
       "fd"  'dired
       "fb"  'bookmark-bmenu-list
+      "fm"  'bookmark-set
       "fj"  'dired-jump
       "fl"  'find-file-literally
       "fR"  'rename-file-and-buffer
@@ -480,6 +497,7 @@ From a stylistic perspective (completely personal preference) I:
       "np"  'my/open-projects
       "nr"  'my/open-readings
       "nn"  'my/open-roam-index
+      "nh"  'my/open-misc
 
       ;; Applications
       ":"   'shell-command
@@ -528,6 +546,65 @@ From a stylistic perspective (completely personal preference) I:
 
 * The user interface configurations (=my-ui.el=)
 
+** soft-wrapper
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  ;; (use-package olivetti
+  ;;   :diminish
+  ;;   :commands olivetti-mode
+  ;;   :config
+  ;;   (setq olivetti-body-width 120)
+  ;;   (setq olivetti-minimum-body-width 120))
+
+  (use-package visual-fill-column
+    :diminish
+    :commands visual-fill-column-mode
+    :init
+    (add-hook 'prog-mode-hook #'visual-fill-column-mode)
+    (add-hook 'text-mode-hook #'visual-fill-column-mode)
+    (setq visual-fill-column-width 100)
+    ;; :config
+    ;; (visual-fill-column-mode 1)
+  )
+#+end_src
+
+** modeline
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (use-package hide-mode-line
+    :diminish
+    :config
+    (add-hook 'help-mode-hook #'hide-mode-line-mode))
+
+  ;; modeline
+  ;; (use-package doom-modeline
+  ;;   :init
+  ;;   (doom-modeline-mode 1)
+  ;;   :config
+  ;;   (setq doom-modeline-height 25))
+
+  (use-package mood-line
+    ;; Use pretty Fira Code-compatible glyphs
+    :custom
+    (mood-line-glyph-alist mood-line-glyphs-fira-code)
+    :config
+    (mood-line-mode))
+
+  ;; add padding around mode line
+  (defun my/pad-mode-line ()
+    "pad my mode-line"
+    (interactive)
+    (let ((active-bg (face-attribute 'mode-line :background))
+  	(inactive-bg (face-attribute 'mode-line-inactive :background)))
+      (custom-set-faces
+       `(mode-line ((t :box (:line-width 4 :color ,active-bg) :background ,active-bg))))))
+
+  ;; (set-face-attribute 'mode-line nil :box '(:line-width 6))
+  ;; (set-face-attribute 'mode-line nil  :height 140)
+
+
+#+end_src
+
 ** themes 
 
 *** theme cycling 
@@ -550,10 +627,16 @@ From a stylistic perspective (completely personal preference) I:
       "Cycles through my themes."
       (interactive)
       (setq my/themes-index (% (1+ my/themes-index) (length my/themes)))
-      (my/load-indexed-theme))
+      (my/load-indexed-theme)
+      (my/pad-mode-line))
 
     (defun my/load-indexed-theme ()
       (load-theme (nth my/themes-index my/themes)))
+
+    ;; (defun my/load-theme ()
+    ;;   (interactive)
+    ;;   (load-theme)
+    ;;   (my/pad-mode-line)) 
 
     (leader "t"   '(:ignore t :which-key "themes")
             "tn"  'my/cycle-theme
@@ -624,33 +707,8 @@ From a stylistic perspective (completely personal preference) I:
 
 #+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
   (load-anti-zenburn)
-#+end_src
-
-** modeline
-
-#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
-  (use-package hide-mode-line
-    :diminish
-    :config
-    (add-hook 'help-mode-hook #'hide-mode-line-mode))
-
-  ;; modeline
-  (use-package doom-modeline
-    :init
-    (doom-modeline-mode 1)
-    :config
-    (setq doom-modeline-height 25))
-#+end_src
-
-** soft-wrapper
-
-#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
-  (use-package olivetti
-    :diminish
-    :commands olivetti-mode
-    :config
-    (setq olivetti-body-width 120)
-    (setq olivetti-minimum-body-width 120))
+  ;; (load-leuven-light)
+  (my/pad-mode-line)
 #+end_src
 
 ** my-ui provider
