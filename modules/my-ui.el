@@ -45,8 +45,7 @@
   (set-face-attribute 'mode-line nil
 		      :box '(:line-width 4 :style flat-button))
   (set-face-attribute 'mode-line-inactive nil
-		      :box '(:line-width 4 :style flat-button))
-  )
+		      :box '(:line-width 4 :style flat-button)))
 
 (with-eval-after-load 'general
   (defun disable-all-themes ()

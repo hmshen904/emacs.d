@@ -218,16 +218,27 @@
       (kill-new mytmplink)
       (message "Copied %s to killring (clipboard)" mytmplink)))
   
-  (defun my/tex-canvasify ()
+  ;; (defun my/tex-dollar2paren-whole ()
+  ;;   (interactive)
+  ;;   (save-excursion
+  ;;     (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max))))
+  
+  (defun my/tex-dollar2paren-region ()
     (interactive)
-    (save-excursion
-      (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max))))
+    (if (region-active-p
+         (save-excursion
+  	 (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (region-beginning) (region-end))))))
   
-  (defun my/tex-uncanvasify ()
-      (interactive)
-      (save-excursion
-        (replace-regexp "\\\\\(.*?\)\\\\)" "\\$\\\1\\\$" nil (point-min) (point-max))))
+  ;; (defun my/tex-paren2dollar-whole ()
+  ;;   (interactive)
+  ;;   (save-excursion
+  ;;     (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max))))
   
+  (defun my/tex-paren2dollar-region ()
+    (interactive)
+    (if (region-active-p)
+        (save-excursion
+  	(replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))))
   (setq org-capture-bookmark nil)
   
   (defun my/org-journal-find-location ()
@@ -385,5 +396,46 @@
                   "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
                   "#+title: ${citar-citekey} (${citar-date}). ${note-title}.\n#+created: %U\n#+last_modified: %U\n\n")
                  :unnarrowed t)))
+
+;; (use-package anki-editor
+;;   :straight (:host github :repo "louietan/anki-editor" :branch "master")
+;;   :after org
+;;   :config
+;;   ;; I like making decks
+;;   (setq anki-editor-create-decks 't
+;;         anki-editor-org-tags-as-anki-tags 't)
+;;   ;; (setq org-my-topo-anki-file (format "%s/%s" org-my-notes "/anki/topo.org")
+;;   ;;       org-my-folland-anki-file (format "%s/%s" org-my-notes "/anki/folland.org")
+;;   ;;       org-my-folland-1-anki-file (format "%s/%s" org-my-notes "/anki/folland-ch1-extras.org")
+;;   ;;       org-my-folland-2-anki-file (format "%s/%s" org-my-notes "/anki/folland-ch2.org")
+;;   ;;       org-my-rockafellar-6-anki-file (format "%s/%s" org-my-notes "/anki/var-analysis-ch6.org")
+;;   ;;       org-my-grammar-anki-file (format "%s/%s" org-my-notes "/anki/grammar.org")
+;;   ;;       org-my-analysis-anki-file (format "%s/%s" org-my-notes "/anki/analysis.org"))
+
+;;   ;; ;; https://orgmode.org/manual/Template-expansion.html
+;;   ;; (add-to-list 'org-capture-templates
+;;   ;;              '("AT" "Topology Basic LaTeX"
+;;   ;;                entry
+;;   ;;                (file+headline org-my-topo-anki-file "Topology")
+;;   ;;                "* Card %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: LaTeX Basic w. Reference\n:ANKI_DECK: Topology\n:END:\n** Front\n%?\n** Back\n\n** Remarks\n\n** Chapter\n\n** Reference\nTopology, 2nd Edition. James Munkres\n"))
+
+;;   ;; (add-to-list 'org-capture-templates
+;;   ;;              '("AF" "Folland Basic LaTeX"
+;;   ;;                entry
+;;   ;;                (file+headline org-my-folland-anki-file "Real Analysis by Folland")
+;;   ;;                "* %^{Card Front} %^g\n:PROPERTIES:\n:ANKI_DECK: %^{Anki Deck Name|RAF::Ch|RAF::Ch.1 Measures|RAF::Ch.2 Integration|RAF::Ch.3 Differentiation}\n:ANKI_NOTE_TYPE: LaTeX Basic w. Reference\n:END:\n** Front\n%\\1 %?\n** Back\n\n** Remarks\n%^{Remarks|None}\n** Chapter\n%^{Chapter|Ch|Ch1|Ch2|Ch3}\n** Reference\nReal Analysis, 2nd Edition. Gerald B. Folland\n"))
+
+;;   ;; (add-to-list 'org-capture-templates
+;;   ;;             '("AV" "Variational Analysis Basic LaTeX"
+;;   ;;                 entry
+;;   ;;                 (file+headline org-my-rockafellar-6-anki-file "Variational Analysis by Rockafellar")
+;;   ;;                 "* Card %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: LaTeX Basic w. Reference\n:END:\n** Front\n%?\n** Back\n\n** Remarks\n\n** Chapter\n\n** Reference\nVariational Analysis, 3rd Printing. Rockafellar and Wets\n"))
+
+;;   ;; (add-to-list 'org-capture-templates
+;;   ;;              '("AG" "English Grammar Basic LaTeX"
+;;   ;;                entry
+;;   ;;                (file+headline org-my-topo-grammar-file "Grammar")
+;;   ;;                "* Card %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: LaTeX Basic w. Reference\n:END:\n** Front\n%?\n** Back\n\n** Remarks\n\n** Chapter\n\n** Reference\n\n"))
+;;   )
 
 (provide 'my-org)
