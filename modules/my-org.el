@@ -218,27 +218,21 @@
       (kill-new mytmplink)
       (message "Copied %s to killring (clipboard)" mytmplink)))
   
-  ;; (defun my/tex-dollar2paren-whole ()
-  ;;   (interactive)
-  ;;   (save-excursion
-  ;;     (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max))))
-  
-  (defun my/tex-dollar2paren-region ()
+  (defun my/tex-dollar2paren ()
     (interactive)
-    (if (region-active-p
+    (if (region-active-p)
          (save-excursion
-  	 (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (region-beginning) (region-end))))))
+  	 (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (region-beginning) (region-end)))
+      (save-excursion
+        (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max)))))
   
-  ;; (defun my/tex-paren2dollar-whole ()
-  ;;   (interactive)
-  ;;   (save-excursion
-  ;;     (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max))))
-  
-  (defun my/tex-paren2dollar-region ()
+  (defun my/tex-paren2dollar ()
     (interactive)
     (if (region-active-p)
         (save-excursion
-  	(replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))))
+  	(replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))
+      (save-excursion
+        (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max)))))
   (setq org-capture-bookmark nil)
   
   (defun my/org-journal-find-location ()
