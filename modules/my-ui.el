@@ -74,7 +74,7 @@
   ;; (defun my/load-theme ()
   ;;   (interactive)
   ;;   (load-theme)
-  ;;   (my/pad-mode-line)) 
+  ;;   (my/pad-mode-line))
 
   (leader "t"   '(:ignore t :which-key "themes")
           "tn"  'my/cycle-theme

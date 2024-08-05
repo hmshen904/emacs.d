@@ -256,4 +256,10 @@
   ;; load default config
   (require 'smartparens-config))
 
+(add-hook 'before-save-hook
+          'delete-trailing-whitespace)
+
+(defun remove-electric-indent-mode ()
+  (electric-indent-local-mode -1))
+
 (provide 'my-editor)

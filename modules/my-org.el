@@ -66,9 +66,14 @@
     (interactive "p")
     (org-agenda arg "a"))
   
-  (leader
-    "na"  'my/open-agenda
+  (defun my/open-agenda-full-todo (&optional arg)
+    "Open org-agenda directly"
+    (interactive "p")
+    (org-agenda arg "n"))
   
+  (leader
+    "aa"  'my/open-agenda
+    "aA"  'my/open-agenda-full-todo
     "X"   'org-capture
     )
   
@@ -99,6 +104,8 @@
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
     "rc" 'org-refile-copy
+  
+    "a"   'org-archive-subtree
     )
   :config
   (require 'ox-gfm nil t)
@@ -252,13 +259,19 @@
   
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  	       "** Tasks [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ]"
+  	       :immediate-finish t
+  	       :jump-to-captured t))
+  
+  (add-to-list 'org-capture-templates
+  	     '("j" "Diary" plain (function my/org-journal-find-location)
+  	       "** Daily Summary [%]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
   	       :immediate-finish t
   	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
   	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	       "* Weekly Goals [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
   	       :immediate-finish t
   	       :jump-to-captured t))
   
@@ -317,6 +330,107 @@
          my-org-proposals))
   
   (setq org-archive-location my-org-archive)
+  (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
+  (setq org-e-latex-tables-booktabs t)
+  (setq org-latex-pdf-process
+      '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
+  (setq org-latex-packages-alist
+      (quote (("" "parskip" t)
+  	    ("" "amsmath" t)
+  	    ("" "amssymb" t)
+  	    ("" "amsthm" t)
+  	    ("" "amsfonts" t)
+  	    ("" "mathtools" t)
+  	    ("" "braket" t)
+  	    ("" "booktabs" t)
+  	    ("" "bbm" t)
+  	    ("" "listings" t)
+  	    ("" "algorithm2e" t)
+  	    ("" "xcolor" t)
+  	    ("" "mymacros" t))))
+  (add-to-list 'org-latex-classes
+  	       '("notes"
+  		"\\documentclass[11pt]{article}
+  \\usepackage[normalem]{ulem}
+  \\usepackage{booktabs}
+  \\usepackage[inline, shortlabels]{enumitem}
+  \\usepackage[backref=true,natbib=true,maxbibnames=99,doi=false,url=false,giveninits=true]{biblatex}
+  \\usepackage{hyperref}
+  \\usepackage{mynotes}
+  \\usepackage{mymacros}
+  [NO-DEFAULT-PACKAGES]
+  [NO-PACKAGES]
+  %%%% configs
+  \\DefineBibliographyStrings{english}{backrefpage={page}, backrefpages={pages}}
+  \\setlength\\parindent{0pt}
+  \\setitemize{itemsep=1pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+  	    '("manuscripts"
+  	    "\\documentclass[11pt]{article}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  \\usepackage[margin=1in]{geometry}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{pgf,interval}
+  \\usepackage{booktabs}
+  \\usepackage[inline]{enumitem}
+  \\usepackage[backref=true,natbib=true,maxbibnames=99,doi=false,url=false,giveninits=true,dashed=false]{biblatex}
+  \\usepackage{hyperref}
+  %%%% configs
+  \\DefineBibliographyStrings{english}{backrefpage={page}, backrefpages={pages}}
+  \\intervalconfig{soft open fences}
+  \\setlength\\parindent{0pt}
+  \\setitemize{itemsep=1pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+  	    '("slides"
+  		"\\documentclass[notheorems]{beamer}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{booktabs}
+  \\usepackage[natbib=true,backend=biber,style=authoryear-icomp,maxbibnames=1,maxcitenames=2,uniquelist=false,doi=false,isbn=false,url=false,eprint=false,dashed=false]{biblatex}
+  \\usepackage{pgfpages}
+  %%%% configs
+  \\setlength\\parindent{0pt}"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  
+  (add-to-list 'org-latex-classes
+  	    '("moderncv"
+  	    "\\documentclass{moderncv}
+  [NO-DEFAULT-PACKAGES]
+  [NO-PACKAGES]"
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  
+  (add-to-list 'org-latex-classes
+  	     '("annual report"
+  		"\\documentclass{article}
+  \\usepackage[utf8]{inputenc}
+  \\usepackage[T1]{fontenc}
+  \\usepackage[normalem]{ulem}
+  [NO-DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{booktabs}
+  \\usepackage[inline]{enumitem}
+  \\usepackage{hyperref}
+  "
+  		("\\section{%s}" . "\\section*{%s}")
+  		("\\subsection{%s}" . "\\subsection*{%s}")
+  		("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  
   )
 
 (use-package org-super-agenda

@@ -39,6 +39,7 @@
     (outline-minor-mode)
     (display-line-numbers-mode t)
     (TeX-source-correlate-mode t)
+    (electric-indent-local-mode -1)
     (prettify-symbols-mode))
   (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
   (add-hook 'TeX-after-compilation-finished-functions
@@ -278,6 +279,7 @@
 
 (use-package pdf-tools
   :magic ("%PDF" . pdf-view-mode)
+  :hook (pdf-view-mode . auto-revert-mode)
   :config
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-page)

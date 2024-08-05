@@ -113,7 +113,7 @@
 (setq my-org-proposals (concat (file-name-as-directory my-org-dir) "proposals.org"))
 (setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
 (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
-(setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
+(setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org::"))
 (setq my-org-roam-index (concat (file-name-as-directory my-org-roam-dir) "index.org"))
 
 (setq my-bib-files (concat (file-name-as-directory my-tex-local-path) "master.bib"))
@@ -126,5 +126,7 @@
 
 (when (file-exists-p my-init-file)
   (setq initial-buffer-choice my-init-file))
+
+(global-auto-revert-mode)
 
 (provide 'my-defaults)

@@ -53,7 +53,7 @@ by delegating to the =init.el=
   (load bootstrap-file nil 'nomessage))
 
 ;; install use-package via straight
-(straight-use-package 'use-package) 
+(straight-use-package 'use-package)
 #+end_src
 
 ** The =early-init.el= gives a name to the default frame
@@ -208,7 +208,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   (setq my-org-proposals (concat (file-name-as-directory my-org-dir) "proposals.org"))
   (setq my-org-teaching (concat (file-name-as-directory my-org-dir) "teaching.org"))
   (setq my-org-misc (concat (file-name-as-directory my-org-dir) "misc.org"))
-  (setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org"))
+  (setq my-org-archive (concat (file-name-as-directory my-org-dir) "archives/archives.org::"))
   (setq my-org-roam-index (concat (file-name-as-directory my-org-roam-dir) "index.org"))
 
   (setq my-bib-files (concat (file-name-as-directory my-tex-local-path) "master.bib"))
@@ -232,6 +232,12 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 
 #+end_src
 
+** auto revert buffers
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  (global-auto-revert-mode)
+#+end_src
+
 ** my-defaults provider
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
@@ -240,7 +246,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 
 * The editor configurations (=my-editor.el=)
 
-** evil configs 
+** evil configs
 
 #+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
   (use-package which-key
@@ -517,7 +523,7 @@ From a stylistic perspective (completely personal preference) I:
 
 #+end_src
 
-** undo 
+** undo
 
 #+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
   (use-package undo-fu
@@ -536,6 +542,20 @@ From a stylistic perspective (completely personal preference) I:
     :config
     ;; load default config
     (require 'smartparens-config))
+#+end_src
+
+** whitespaces
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (add-hook 'before-save-hook
+            'delete-trailing-whitespace)
+#+end_src
+
+** electric indent
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (defun remove-electric-indent-mode ()
+    (electric-indent-local-mode -1))
 #+end_src
 
 ** my-editor provider
@@ -603,9 +623,9 @@ From a stylistic perspective (completely personal preference) I:
   		      :box '(:line-width 4 :style flat-button)))
 #+end_src
 
-** themes 
+** themes
 
-*** theme cycling 
+*** theme cycling
 #+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
   (with-eval-after-load 'general
     (defun disable-all-themes ()
@@ -634,7 +654,7 @@ From a stylistic perspective (completely personal preference) I:
     ;; (defun my/load-theme ()
     ;;   (interactive)
     ;;   (load-theme)
-    ;;   (my/pad-mode-line)) 
+    ;;   (my/pad-mode-line))
 
     (leader "t"   '(:ignore t :which-key "themes")
             "tn"  'my/cycle-theme
@@ -821,7 +841,7 @@ From a stylistic perspective (completely personal preference) I:
 
 * the org-mode configurations (=my-org.el=)
 
-** org-journal (get prepared for org-capture) 
+** org-journal (get prepared for org-capture)
 
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
   (use-package org-journal
@@ -904,6 +924,7 @@ From a stylistic perspective (completely personal preference) I:
     <<org-capture>>
     <<org-refile>>
     <<org-agenda>>
+    <<org-latex>>
     )
 #+end_src
 
@@ -1064,9 +1085,14 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
     (interactive "p")
     (org-agenda arg "a"))
 
-  (leader
-    "na"  'my/open-agenda
+  (defun my/open-agenda-full-todo (&optional arg)
+    "Open org-agenda directly"
+    (interactive "p")
+    (org-agenda arg "n"))
 
+  (leader
+    "aa"  'my/open-agenda
+    "aA"  'my/open-agenda-full-todo
     "X"   'org-capture
     )
 
@@ -1100,6 +1126,8 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
     "rc" 'org-refile-copy
+
+    "a"   'org-archive-subtree
     )
 #+end_src
 
@@ -1128,13 +1156,19 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ] Org my life. \n- [ ] Enjoy my day. \n- [ ] Keep Exercising."
+  	       "** Tasks [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ]"
+  	       :immediate-finish t
+  	       :jump-to-captured t))
+
+  (add-to-list 'org-capture-templates
+  	     '("j" "Diary" plain (function my/org-journal-find-location)
+  	       "** Daily Summary [%]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
   	       :immediate-finish t
   	       :jump-to-captured t))
 
   (add-to-list 'org-capture-templates
   	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "* Weekly Goals [%]\nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	       "* Weekly Goals [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
   	       :immediate-finish t
   	       :jump-to-captured t))
 
@@ -1446,7 +1480,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 #+end_src
 
 * The latex configurations (=my-latex.el=)
-** auctex 
+** auctex
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
   (use-package auctex
     :no-require t
@@ -1481,38 +1515,39 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 ** tex
 
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
-  (use-package tex
-    :straight auctex
-    :config
-    (defun my-LaTeX-mode-hooks ()
-      (latex-electric-env-pair-mode)
-      (whitespace-mode)
-      (show-paren-mode)
-      (visual-line-mode)
-      (flyspell-mode)
-      (outline-minor-mode)
-      (display-line-numbers-mode t)
-      (TeX-source-correlate-mode t)
-      (prettify-symbols-mode))
-    (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
-    (add-hook 'TeX-after-compilation-finished-functions
-                #'TeX-revert-document-buffer)
-    (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
+    (use-package tex
+      :straight auctex
+      :config
+      (defun my-LaTeX-mode-hooks ()
+        (latex-electric-env-pair-mode)
+        (whitespace-mode)
+        (show-paren-mode)
+        (visual-line-mode)
+        (flyspell-mode)
+        (outline-minor-mode)
+        (display-line-numbers-mode t)
+        (TeX-source-correlate-mode t)
+        (electric-indent-local-mode -1)
+        (prettify-symbols-mode))
+      (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
+      (add-hook 'TeX-after-compilation-finished-functions
+                  #'TeX-revert-document-buffer)
+      (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
-    ;; (setq TeX-electric-math (cons "\\(" "\\)"))
-    (setq LaTeX-electric-left-right-brace t)
-    (setq prettify-symbols-unprettify-at-point 'right-edge)
-    (setq TeX-command-default "LaTeXmk")
-    (local-leader LaTeX-mode-map
-      "p" 'preview-at-point
-      "m" 'TeX-command-master
-      "c" 'TeX-command-run-all
-      "v" 'TeX-view
-      )
-  )
+      ;; (setq TeX-electric-math (cons "\\(" "\\)"))
+      (setq LaTeX-electric-left-right-brace t)
+      (setq prettify-symbols-unprettify-at-point 'right-edge)
+      (setq TeX-command-default "LaTeXmk")
+      (local-leader LaTeX-mode-map
+        "p" 'preview-at-point
+        "m" 'TeX-command-master
+        "c" 'TeX-command-run-all
+        "v" 'TeX-view
+        )
+    )
 
-  (use-package evil-tex
-    :hook (LaTeX-mode . evil-tex-mode))
+    (use-package evil-tex
+      :hook (LaTeX-mode . evil-tex-mode))
 #+end_src
 
 ** cdlatex
@@ -1603,7 +1638,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     )
 #+end_src
 
-** bibtex 
+** bibtex
 
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
   ;; (defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))
@@ -1752,6 +1787,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
   (use-package pdf-tools
     :magic ("%PDF" . pdf-view-mode)
+    :hook (pdf-view-mode . auto-revert-mode)
     :config
     (pdf-tools-install)
     (setq-default pdf-view-display-size 'fit-page)
