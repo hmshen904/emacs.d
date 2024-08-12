@@ -259,7 +259,7 @@
   
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ]"
+  	       "** Tasks [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
   	       :immediate-finish t
   	       :jump-to-captured t))
   
