@@ -13,10 +13,12 @@
         TeX-engine 'xetex ;; use xelatex by default
         TeX-save-query nil)
 
+  ;; (setq TeX-quote-after-quote t)
+
   (setq TeX-view-program-list
-        '(("PDF Tools" TeX-pdf-tools-sync-view)
-          ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
-          ("preview-pane" latex-preview-pane-mode)))
+	'(("PDF Tools" TeX-pdf-tools-sync-view)
+	  ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+	  ("preview-pane" latex-preview-pane-mode)))
 
   (setq TeX-view-program-selection
         '((output-pdf "PDF Tools")
@@ -43,7 +45,7 @@
     (prettify-symbols-mode))
   (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
   (add-hook 'TeX-after-compilation-finished-functions
-              #'TeX-revert-document-buffer)
+	    #'TeX-revert-document-buffer)
   (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
   ;; (setq TeX-electric-math (cons "\\(" "\\)"))
@@ -51,10 +53,10 @@
   (setq prettify-symbols-unprettify-at-point 'right-edge)
   (setq TeX-command-default "LaTeXmk")
   (local-leader LaTeX-mode-map
-    "p" 'preview-at-point
+    "P" 'preview-at-point
     "m" 'TeX-command-master
-    "c" 'TeX-command-run-all
-    "v" 'TeX-view
+    "C" 'TeX-command-run-all
+    "V" 'TeX-view
     )
 )
 
@@ -86,6 +88,7 @@
           (?: ("\\colon" "" ""))
           (?H ("\\hop" "" ""))
           (?T ("\\top" "" ""))
+          (?\" ("\\dbquot" "" ""))
           )
         cdlatex-math-modify-alist
         '(
@@ -227,52 +230,61 @@
     )
   )
 
-(use-package biblio
-  :general-config
-  (local-leader bibtex-mode-map
-    "i" 'biblio-doi-insert-bibtex))
+;; (use-package biblio
+;;   :general-config
+;;   (local-leader bibtex-mode-map
+;;     "i" 'biblio-doi-insert-bibtex))
 
-(use-package bibtex-utils
-  :hook (bibtex-mode . load-bibtex-utils)
-  ;; :magic ("%bib" . load-bibtex-utils)
-  ;; :mode ("\\.bib\\'" . load-bibtex-utils)
-  :commands bu-jump-to-doc
-  :config
-  (defun load-bibtex-utils ()
-    (progn
-      (require 'bibtex-utils)
-      (my-bibtex-mode-hooks)))
-  (defun my-bibtex-mode-hooks ()
-    (auto-fill-mode 0)
-    (display-line-numbers-mode 1))
-  (setq bu-pdf-dir (symbol-value 'my-pdf-library)
-        bibtex-autokey-titlewords 2
-        bibtex-autokey-titlewords-stretch 0
-        bibtex-autokey-names-stretch 1
-        bibtex-autokey-year-title-separator "_"
-        bibtex-maintain-sorted-entries t)
+;; (use-package bibtex-utils
+;;   :hook (bibtex-mode . load-bibtex-utils)
+;;   ;; :magic ("%bib" . load-bibtex-utils)
+;;   ;; :mode ("\\.bib\\'" . load-bibtex-utils)
+;;   :commands bu-jump-to-doc
+;;   :config
+;;   (defun load-bibtex-utils ()
+;;     (progn
+;;       (require 'bibtex-utils)
+;;       (my-bibtex-mode-hooks)))
+;;   (defun my-bibtex-mode-hooks ()
+;;     (auto-fill-mode 0)
+;;     (display-line-numbers-mode 1))
+;;   (setq bu-pdf-dir (symbol-value 'my-pdf-library)
+;;         bibtex-autokey-titlewords 2
+;;         bibtex-autokey-titlewords-stretch 0
+;;         bibtex-autokey-names-stretch 1
+;;         bibtex-autokey-year-title-separator "_"
+;;         bibtex-maintain-sorted-entries t)
 
-  :general
+;;   :general
 
-  (general-def '(normal insert visual emacs) bibtex-mode-map
-    "C-n"  'bu-next-entry
-    "C-p"  'bu-previous-entry
-    )
-  (local-leader bibtex-mode-map
-    "o" 'bu-open-doc
-    "K" 'bu-make-field-keywords
-    "c" 'bibtex-clean-entry)
+;;   (general-def '(normal insert visual emacs) bibtex-mode-map
+;;     "C-n"  'bu-next-entry
+;;     "C-p"  'bu-previous-entry
+;;     )
+;;   (local-leader bibtex-mode-map
+;;     "o" 'bu-open-doc
+;;     "K" 'bu-make-field-keywords
+;;     "c" 'bibtex-clean-entry)
 
-  (local-leader
-    :keymaps '(LaTeX-mode-map)
-    "o" 'bu-jump-to-doc))
+;;   (local-leader
+;;     :keymaps '(LaTeX-mode-map)
+;;     "o" 'bu-jump-to-doc))
 
 (use-package reftex
   :straight (:type built-in)
   :config
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
   (setq reftex-plug-into-AUCTeX t
-      reftex-default-bibliography (symbol-value 'my-bib-files))
+	reftex-default-bibliography (symbol-value 'my-bib-files))
+  (local-leader
+    :keymaps '(LaTeX-mode-map)
+    ";"  'reftex-toc
+    "R"  'reftex-reference
+    "c"  '(:ignore t :which-key "cite")
+    "cc" 'reftex-cite
+    "cp" 'reftex-citep
+    "ct" 'reftex-citet
+    )
   ;; (local-leader LaTeX-mode-map
   ;;     "r"   'reftex-reference)
 )

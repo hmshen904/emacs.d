@@ -21,20 +21,12 @@
   :config
   (add-hook 'help-mode-hook #'hide-mode-line-mode))
 
-;; modeline
-;; (use-package doom-modeline
-;;   :init
-;;   (doom-modeline-mode 1)
-;;   :config
-;;   (setq doom-modeline-height 25))
-
 (use-package mood-line
   ;; Use pretty Fira Code-compatible glyphs
   :custom
   (mood-line-glyph-alist mood-line-glyphs-fira-code)
   :config
   (mood-line-mode))
-
 
 ;; add padding around mode line
 ;; The :style flat-button makes the border have the same color as the background of the mode line.
@@ -45,7 +37,8 @@
   (set-face-attribute 'mode-line nil
 		      :box '(:line-width 4 :style flat-button))
   (set-face-attribute 'mode-line-inactive nil
-		      :box '(:line-width 4 :style flat-button)))
+		      :box '(:line-width 4 :style flat-button))
+  )
 
 (with-eval-after-load 'general
   (defun disable-all-themes ()

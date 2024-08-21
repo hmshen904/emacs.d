@@ -457,14 +457,12 @@ From a stylistic perspective (completely personal preference) I:
       "b"   '(:ignore t :which-key "buffer")
       ;; "bb"  'mode-line-other-buffer
       "bk"  'kill-this-buffer
-      "bn"  'next-buffer
-      "bp"  'previous-buffer
-      ;; "b]"  'next-buffer
-      ;; "b["  'previous-buffer
+      "b]"  'next-buffer
+      "b["  'previous-buffer
       "bq"  'kill-buffer-and-window
       "bR"  'rename-file-and-buffer
       "br"  'revert-buffer
-      "bb"  'switch-to-buffer
+      "bB"  'switch-to-buffer
       "bi"  'ibuffer
 
       ;; Window operations
@@ -535,13 +533,61 @@ From a stylistic perspective (completely personal preference) I:
 
 #+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
   (use-package smartparens-mode
+    :defer t
     :straight (:host github :repo "Fuco1/smartparens"
                :branch "master")
-    :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
-    :diminish
+    :hook
+    (prog-mode LaTeX-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+    :diminish smartparens-mode
+    :commands (smartparens-mode show-smartparens-mode)
     :config
     ;; load default config
-    (require 'smartparens-config))
+    (require 'smartparens-config)
+    (sp-use-smartparens-bindings)
+    (sp--update-override-key-bindings)
+    ;; (setq sp-ignore-modes-list
+    ;;       (append sp-ignore-modes-list
+    ;;               '(tex-mode plain-tex-mode latex-mode LaTeX-mode)))
+
+    ;; (defun my-latex-smartparens-config ()
+    ;;   (sp-local-pair '(tex-mode plain-tex-mode TeX-mode latex-mode LaTeX-mode)
+    ;; 		   "``" "''"
+    ;;                  :trigger "\""
+    ;;                  :pre-handlers  '(sp-latex-pre-slurp-handler)
+    ;;                  :post-handlers '(sp-latex-skip-double-quote)))
+
+    ;; (sp-with-modes 'LaTeX-mode
+    ;;   (sp-local-pair "``" "''"
+    ;; 		   :trigger "\""
+    ;; 		   :pre-handlers  '(sp-latex-pre-slurp-handler)
+    ;; 		   :post-handlers '(sp-latex-skip-double-quote)))
+
+    ;; (sp-local-pair '(tex-mode plain-tex-mode TeX-mode latex-mode LaTeX-mode)
+    ;;                "``" "''"
+    ;;                :trigger "\""
+    ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+    ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+    ;; https://emacs.stackexchange.com/questions/31166/smartparens-not-insert-pair-of-latex-quotes
+    ;; (sp-local-pair '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
+    ;;                "``" "''"
+    ;;                :trigger "\""
+    ;;                :unless '(sp-latex-point-after-backslash
+    ;;                          sp-point-before-word-p
+    ;;                          sp-point-after-word-p)
+    ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+    ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+    ;; (sp-local-pair '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
+    ;;                "`" "'"
+    ;;                :trigger "'"
+    ;;                :unless '(sp-latex-point-after-backslash
+    ;;                          sp-point-before-word-p
+    ;;                          sp-point-after-word-p)
+    ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+    ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+    )
 #+end_src
 
 ** whitespaces
@@ -596,20 +642,12 @@ From a stylistic perspective (completely personal preference) I:
     :config
     (add-hook 'help-mode-hook #'hide-mode-line-mode))
 
-  ;; modeline
-  ;; (use-package doom-modeline
-  ;;   :init
-  ;;   (doom-modeline-mode 1)
-  ;;   :config
-  ;;   (setq doom-modeline-height 25))
-
   (use-package mood-line
     ;; Use pretty Fira Code-compatible glyphs
     :custom
     (mood-line-glyph-alist mood-line-glyphs-fira-code)
     :config
     (mood-line-mode))
-
 
   ;; add padding around mode line
   ;; The :style flat-button makes the border have the same color as the background of the mode line.
@@ -620,7 +658,8 @@ From a stylistic perspective (completely personal preference) I:
     (set-face-attribute 'mode-line nil
   		      :box '(:line-width 4 :style flat-button))
     (set-face-attribute 'mode-line-inactive nil
-  		      :box '(:line-width 4 :style flat-button)))
+  		      :box '(:line-width 4 :style flat-button))
+    )
 #+end_src
 
 ** themes
@@ -839,7 +878,42 @@ From a stylistic perspective (completely personal preference) I:
   (provide 'my-completion)
 #+end_src
 
-* the org-mode configurations (=my-org.el=)
+* The project manager
+
+** projectile mode
+
+#+begin_src emacs-lisp :tangle "modules/my-completion.el" :mkdirp yes
+  (use-package projectile
+    :ensure
+    :defer 0.2
+    :general
+    (leader
+      :states 'normal
+      "SPC" '(projectile-find-file :which-key "find file")
+
+      ;; Buffers
+      "bb" '(projectile-switch-to-buffer :which-key "switch buffer")
+      "bn" '(projectile-next-project-buffer :which-key "next project buffer")
+      "bp" '(projectile-previous-project-buffer :which-key "previous project buffer")
+
+      ;; Projects
+      "p"   '(:ignore t :which-key "projects")
+      ;; "p <escape>" '(keyboard-escape-quit :which-key t)
+      "pc" '(projectile-compile-project :which-key "compile project")
+      "pp" '(projectile-switch-project :which-key "switch project")
+      "pa" '(projectile-add-known-project :which-key "add project")
+      "pr" '(projectile-remove-known-project :which-key "remove project"))
+    :init
+    (projectile-mode +1)
+    (projectile-register-project-type 'latex '(".latexmkrc" "main.tex")
+  				    :compile "latexmk -pdf"
+  				    :test "latexmk -pdf"
+  				    :run "evince main.pdf"
+  				    :test-suffix ".tex")
+    )
+#+end_src
+
+* The org-mode configurations (=my-org.el=)
 
 ** org-journal (get prepared for org-capture)
 
@@ -1497,10 +1571,12 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
           TeX-engine 'xetex ;; use xelatex by default
           TeX-save-query nil)
 
+    ;; (setq TeX-quote-after-quote t)
+
     (setq TeX-view-program-list
-          '(("PDF Tools" TeX-pdf-tools-sync-view)
-            ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
-            ("preview-pane" latex-preview-pane-mode)))
+  	'(("PDF Tools" TeX-pdf-tools-sync-view)
+  	  ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+  	  ("preview-pane" latex-preview-pane-mode)))
 
     (setq TeX-view-program-selection
           '((output-pdf "PDF Tools")
@@ -1515,39 +1591,39 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 ** tex
 
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
-    (use-package tex
-      :straight auctex
-      :config
-      (defun my-LaTeX-mode-hooks ()
-        (latex-electric-env-pair-mode)
-        (whitespace-mode)
-        (show-paren-mode)
-        (visual-line-mode)
-        (flyspell-mode)
-        (outline-minor-mode)
-        (display-line-numbers-mode t)
-        (TeX-source-correlate-mode t)
-        (electric-indent-local-mode -1)
-        (prettify-symbols-mode))
-      (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
-      (add-hook 'TeX-after-compilation-finished-functions
-                  #'TeX-revert-document-buffer)
-      (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
+  (use-package tex
+    :straight auctex
+    :config
+    (defun my-LaTeX-mode-hooks ()
+      (latex-electric-env-pair-mode)
+      (whitespace-mode)
+      (show-paren-mode)
+      (visual-line-mode)
+      (flyspell-mode)
+      (outline-minor-mode)
+      (display-line-numbers-mode t)
+      (TeX-source-correlate-mode t)
+      (electric-indent-local-mode -1)
+      (prettify-symbols-mode))
+    (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
+    (add-hook 'TeX-after-compilation-finished-functions
+  	    #'TeX-revert-document-buffer)
+    (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
-      ;; (setq TeX-electric-math (cons "\\(" "\\)"))
-      (setq LaTeX-electric-left-right-brace t)
-      (setq prettify-symbols-unprettify-at-point 'right-edge)
-      (setq TeX-command-default "LaTeXmk")
-      (local-leader LaTeX-mode-map
-        "p" 'preview-at-point
-        "m" 'TeX-command-master
-        "c" 'TeX-command-run-all
-        "v" 'TeX-view
-        )
-    )
+    ;; (setq TeX-electric-math (cons "\\(" "\\)"))
+    (setq LaTeX-electric-left-right-brace t)
+    (setq prettify-symbols-unprettify-at-point 'right-edge)
+    (setq TeX-command-default "LaTeXmk")
+    (local-leader LaTeX-mode-map
+      "P" 'preview-at-point
+      "m" 'TeX-command-master
+      "C" 'TeX-command-run-all
+      "V" 'TeX-view
+      )
+  )
 
-    (use-package evil-tex
-      :hook (LaTeX-mode . evil-tex-mode))
+  (use-package evil-tex
+    :hook (LaTeX-mode . evil-tex-mode))
 #+end_src
 
 ** cdlatex
@@ -1578,6 +1654,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
             (?: ("\\colon" "" ""))
             (?H ("\\hop" "" ""))
             (?T ("\\top" "" ""))
+            (?\" ("\\dbquot" "" ""))
             )
           cdlatex-math-modify-alist
           '(
@@ -1726,46 +1803,47 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     )
 #+end_src
 
+Currently not using emacs to manage bibs
 #+begin_src emacs-lisp :tangle "modules/my-latex.el" :mkdirp yes
-  (use-package biblio
-    :general-config
-    (local-leader bibtex-mode-map
-      "i" 'biblio-doi-insert-bibtex))
+  ;; (use-package biblio
+  ;;   :general-config
+  ;;   (local-leader bibtex-mode-map
+  ;;     "i" 'biblio-doi-insert-bibtex))
 
-  (use-package bibtex-utils
-    :hook (bibtex-mode . load-bibtex-utils)
-    ;; :magic ("%bib" . load-bibtex-utils)
-    ;; :mode ("\\.bib\\'" . load-bibtex-utils)
-    :commands bu-jump-to-doc
-    :config
-    (defun load-bibtex-utils ()
-      (progn
-        (require 'bibtex-utils)
-        (my-bibtex-mode-hooks)))
-    (defun my-bibtex-mode-hooks ()
-      (auto-fill-mode 0)
-      (display-line-numbers-mode 1))
-    (setq bu-pdf-dir (symbol-value 'my-pdf-library)
-          bibtex-autokey-titlewords 2
-          bibtex-autokey-titlewords-stretch 0
-          bibtex-autokey-names-stretch 1
-          bibtex-autokey-year-title-separator "_"
-          bibtex-maintain-sorted-entries t)
+  ;; (use-package bibtex-utils
+  ;;   :hook (bibtex-mode . load-bibtex-utils)
+  ;;   ;; :magic ("%bib" . load-bibtex-utils)
+  ;;   ;; :mode ("\\.bib\\'" . load-bibtex-utils)
+  ;;   :commands bu-jump-to-doc
+  ;;   :config
+  ;;   (defun load-bibtex-utils ()
+  ;;     (progn
+  ;;       (require 'bibtex-utils)
+  ;;       (my-bibtex-mode-hooks)))
+  ;;   (defun my-bibtex-mode-hooks ()
+  ;;     (auto-fill-mode 0)
+  ;;     (display-line-numbers-mode 1))
+  ;;   (setq bu-pdf-dir (symbol-value 'my-pdf-library)
+  ;;         bibtex-autokey-titlewords 2
+  ;;         bibtex-autokey-titlewords-stretch 0
+  ;;         bibtex-autokey-names-stretch 1
+  ;;         bibtex-autokey-year-title-separator "_"
+  ;;         bibtex-maintain-sorted-entries t)
 
-    :general
+  ;;   :general
 
-    (general-def '(normal insert visual emacs) bibtex-mode-map
-      "C-n"  'bu-next-entry
-      "C-p"  'bu-previous-entry
-      )
-    (local-leader bibtex-mode-map
-      "o" 'bu-open-doc
-      "K" 'bu-make-field-keywords
-      "c" 'bibtex-clean-entry)
+  ;;   (general-def '(normal insert visual emacs) bibtex-mode-map
+  ;;     "C-n"  'bu-next-entry
+  ;;     "C-p"  'bu-previous-entry
+  ;;     )
+  ;;   (local-leader bibtex-mode-map
+  ;;     "o" 'bu-open-doc
+  ;;     "K" 'bu-make-field-keywords
+  ;;     "c" 'bibtex-clean-entry)
 
-    (local-leader
-      :keymaps '(LaTeX-mode-map)
-      "o" 'bu-jump-to-doc))
+  ;;   (local-leader
+  ;;     :keymaps '(LaTeX-mode-map)
+  ;;     "o" 'bu-jump-to-doc))
 #+end_src
 
 ** reftex
@@ -1776,7 +1854,16 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     :config
     (add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
     (setq reftex-plug-into-AUCTeX t
-        reftex-default-bibliography (symbol-value 'my-bib-files))
+  	reftex-default-bibliography (symbol-value 'my-bib-files))
+    (local-leader
+      :keymaps '(LaTeX-mode-map)
+      ";"  'reftex-toc
+      "R"  'reftex-reference
+      "c"  '(:ignore t :which-key "cite")
+      "cc" 'reftex-cite
+      "cp" 'reftex-citep
+      "ct" 'reftex-citet
+      )
     ;; (local-leader LaTeX-mode-map
     ;;     "r"   'reftex-reference)
   )
@@ -1800,6 +1887,7 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 (provide 'my-latex)
 #+end_src
 
+* Bibliography
 * The coding environment (=my-code.el=)
 
 #+begin_src emacs-lisp :tangle "modules/my-code.el" :mkdirp yes

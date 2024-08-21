@@ -97,3 +97,32 @@
     "C-p" 'corfu-previous))
 
 (provide 'my-completion)
+
+(use-package projectile
+  :ensure
+  :defer 0.2
+  :general
+  (leader
+    :states 'normal
+    "SPC" '(projectile-find-file :which-key "find file")
+
+    ;; Buffers
+    "bb" '(projectile-switch-to-buffer :which-key "switch buffer")
+    "bn" '(projectile-next-project-buffer :which-key "next project buffer")
+    "bp" '(projectile-previous-project-buffer :which-key "previous project buffer")
+
+    ;; Projects
+    "p"   '(:ignore t :which-key "projects")
+    ;; "p <escape>" '(keyboard-escape-quit :which-key t)
+    "pc" '(projectile-compile-project :which-key "compile project")
+    "pp" '(projectile-switch-project :which-key "switch project")
+    "pa" '(projectile-add-known-project :which-key "add project")
+    "pr" '(projectile-remove-known-project :which-key "remove project"))
+  :init
+  (projectile-mode +1)
+  (projectile-register-project-type 'latex '(".latexmkrc" "main.tex")
+				    :compile "latexmk -pdf"
+				    :test "latexmk -pdf"
+				    :run "evince main.pdf"
+				    :test-suffix ".tex")
+  )

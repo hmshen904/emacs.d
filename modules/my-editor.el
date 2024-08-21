@@ -179,14 +179,12 @@
     "b"   '(:ignore t :which-key "buffer")
     ;; "bb"  'mode-line-other-buffer
     "bk"  'kill-this-buffer
-    "bn"  'next-buffer
-    "bp"  'previous-buffer
-    ;; "b]"  'next-buffer
-    ;; "b["  'previous-buffer
+    "b]"  'next-buffer
+    "b["  'previous-buffer
     "bq"  'kill-buffer-and-window
     "bR"  'rename-file-and-buffer
     "br"  'revert-buffer
-    "bb"  'switch-to-buffer
+    "bB"  'switch-to-buffer
     "bi"  'ibuffer
 
     ;; Window operations
@@ -248,13 +246,61 @@
   ('normal "C-r" 'undo-fu-only-redo))
 
 (use-package smartparens-mode
+  :defer t
   :straight (:host github :repo "Fuco1/smartparens"
              :branch "master")
-  :hook (prog-mode text-mode markdown-mode) ;; add `smartparens-mode` to these hooks
-  :diminish
+  :hook
+  (prog-mode LaTeX-mode markdown-mode) ;; add `smartparens-mode` to these hooks
+  :diminish smartparens-mode
+  :commands (smartparens-mode show-smartparens-mode)
   :config
   ;; load default config
-  (require 'smartparens-config))
+  (require 'smartparens-config)
+  (sp-use-smartparens-bindings)
+  (sp--update-override-key-bindings)
+  ;; (setq sp-ignore-modes-list
+  ;;       (append sp-ignore-modes-list
+  ;;               '(tex-mode plain-tex-mode latex-mode LaTeX-mode)))
+
+  ;; (defun my-latex-smartparens-config ()
+  ;;   (sp-local-pair '(tex-mode plain-tex-mode TeX-mode latex-mode LaTeX-mode)
+  ;; 		   "``" "''"
+  ;;                  :trigger "\""
+  ;;                  :pre-handlers  '(sp-latex-pre-slurp-handler)
+  ;;                  :post-handlers '(sp-latex-skip-double-quote)))
+
+  ;; (sp-with-modes 'LaTeX-mode
+  ;;   (sp-local-pair "``" "''"
+  ;; 		   :trigger "\""
+  ;; 		   :pre-handlers  '(sp-latex-pre-slurp-handler)
+  ;; 		   :post-handlers '(sp-latex-skip-double-quote)))
+
+  ;; (sp-local-pair '(tex-mode plain-tex-mode TeX-mode latex-mode LaTeX-mode)
+  ;;                "``" "''"
+  ;;                :trigger "\""
+  ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+  ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+  ;; https://emacs.stackexchange.com/questions/31166/smartparens-not-insert-pair-of-latex-quotes
+  ;; (sp-local-pair '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
+  ;;                "``" "''"
+  ;;                :trigger "\""
+  ;;                :unless '(sp-latex-point-after-backslash
+  ;;                          sp-point-before-word-p
+  ;;                          sp-point-after-word-p)
+  ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+  ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+  ;; (sp-local-pair '(tex-mode plain-tex-mode latex-mode LaTeX-mode)
+  ;;                "`" "'"
+  ;;                :trigger "'"
+  ;;                :unless '(sp-latex-point-after-backslash
+  ;;                          sp-point-before-word-p
+  ;;                          sp-point-after-word-p)
+  ;;                :pre-handlers  '(sp-latex-pre-slurp-handler)
+  ;;                :post-handlers '(sp-latex-skip-double-quote))
+
+  )
 
 (add-hook 'before-save-hook
           'delete-trailing-whitespace)
