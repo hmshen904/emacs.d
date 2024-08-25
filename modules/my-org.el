@@ -110,7 +110,7 @@
   :config
   (require 'ox-gfm nil t)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
+        '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
           (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
           (sequence "NEXT(n)" "INPROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
   
@@ -259,42 +259,42 @@
   
   (add-to-list 'org-capture-templates
   	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	       "** Tasks [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
   	       :immediate-finish t
   	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
   	     '("j" "Diary" plain (function my/org-journal-find-location)
-  	       "** Daily Summary [%]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
+  	       "** Daily Summary [/]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
   	       :immediate-finish t
   	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
   	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "* Weekly Goals [%]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	       "* Weekly Goals [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
   	       :immediate-finish t
   	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
   	     '("p" "Proposal to write [inbox]" entry
-  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{PROPOSAL TITLE} [%]
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROPOSAL TITLE} [/]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
-    :END:\n** TODO [%\\1] Prep. the budget form\n** TODO [%\\1] Literature Review [%]\n** TODO [%\\1] Proposal Writing [%]\n** TODO [%\\1] Supplementary Doc Prep. [%]"))
+    :END:\n** WAITING Prep. the budget form\n** WAITING Literature Review [/]\n** WAITING Proposal Writing [/]\n** WAITING Supplementary Doc Prep. [/]"))
   
   (add-to-list 'org-capture-templates
-  	     '("r" "Research project to think [inbox]" entry
-  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{PROJECT TITLE} [%]
+  	     '("r" "Research project [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROJECT TITLE} [/]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
-    :END:\n** TODO [%\\1] Literature review [%]\n** TODO [%\\1] Research questions [%]\n** TODO [%\\1] Paper writing [%]"))
+    :END:\n** WAITING Literature review [/]\n** WAITING Research questions [/]\n** WAITING Paper writing [/]"))
   
   (add-to-list 'org-capture-templates
   	     '("R" "Paper/Proposal to review [inbox]" entry
-  	       (file+headline my-org-inbox "Tasks") "* [%^{SHORT}] %^{TITLE} [%]
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{TITLE} [%]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
-    :END:\n** TODO [%\\1] Submission overview\n** TODO [%\\1] Submission evaluation[%]\n** TODO [%\\1] Review letter writing [%]"))
+    :END:\n** WAITING Submission overview\n** WAITING Submission evaluation[/]\n** WAITING Review letter writing [/]"))
   ;; refile configs
   (defun my/opened-buffer-files ()
       "Return the list of files currently opened in emacs"
@@ -324,10 +324,11 @@
          my-org-inbox
          my-org-gtd
          my-org-misc
-         my-org-projects
-         my-org-teaching
-         my-org-reading
-         my-org-proposals))
+         ;; my-org-projects
+         ;; my-org-teaching
+         ;; my-org-reading
+         ;; my-org-proposals
+         ))
   
   (setq org-archive-location my-org-archive)
   (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
