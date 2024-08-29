@@ -214,14 +214,15 @@
     "fl"  'find-file-literally
     "fR"  'rename-file-and-buffer
     "fs"  'save-buffer
+    "RET" 'bookmark-bmenu-list
 
     ;; Org mode
 
     "n"   '(:ignore t :which-key "notes")
     "ni"  'my/open-inbox
     "ng"  'my/open-gtd
-    "np"  'my/open-projects
-    "nr"  'my/open-readings
+    ;; "np"  'my/open-projects
+    ;; "nr"  'my/open-readings
     "nn"  'my/open-roam-index
     "nh"  'my/open-misc
 

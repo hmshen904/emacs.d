@@ -293,7 +293,6 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 #+end_src
 
 ** key bindings using =general.el=
-
 *** best practices by the author of =general.el=
 
 To facilitate extensibility and easy creation of wrappers, ~general-define-key~ uses keyword arguments to specify everything besides the key definitions, including for the =:states= and =:keymaps=. Since users will most often specify one or both of these keyword arguments, ~general-define-key~ is often less concise than ~define-key~ or ~evil-define-key~. It is for this reason that it is recommended that ~general-define-key~ not be used directly. =general.el= provides wrappers around ~general-define-key~ that take positional arguments like ~define-key~ and ~evil-define-key~ (~general-emacs-define-key~, ~general-evil-define-key~, and ~general-def~). It is recommended that you use these instead of ~general-define-key~. ~general-create-definer~ can also be used to create a new definer with certain default settings (e.g. prefix settings). For clarity and consistency, examples in the documentation usually use ~general-define-key~ unless the example is explicitly for a wrapper. However, [[#positional-argument-wrappers][~general-def~]] is recommended over ~general-define-key~ as it is more flexible and concise. Positional arguments are /optional but not required/, so ~general-def~ can mostly act as a drop-in replacement for many key definers (including ~general-define-key~, ~define-key~, and ~evil-define-key~). Note that ~general-create-definer~ and the =:general= keyword argument for ~use-package~ use ~general-def~. I personally only use ~general-def~.
@@ -492,14 +491,15 @@ From a stylistic perspective (completely personal preference) I:
       "fl"  'find-file-literally
       "fR"  'rename-file-and-buffer
       "fs"  'save-buffer
+      "RET" 'bookmark-bmenu-list
 
       ;; Org mode
 
       "n"   '(:ignore t :which-key "notes")
       "ni"  'my/open-inbox
       "ng"  'my/open-gtd
-      "np"  'my/open-projects
-      "nr"  'my/open-readings
+      ;; "np"  'my/open-projects
+      ;; "nr"  'my/open-readings
       "nn"  'my/open-roam-index
       "nh"  'my/open-misc
 
@@ -1664,7 +1664,9 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
             (?n "\\norm" nil t nil nil)
             (?a "\\abs" nil t nil nil)
             (?- "\\overline" nil t nil nil)
-            (?0 "\\text" nil t nil nil)))
+            ;; (?0 "\\text" nil t nil nil) % 't does the job
+  	  )
+  	)
 
     (setq cdlatex-env-alist
           '(

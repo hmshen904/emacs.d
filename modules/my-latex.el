@@ -97,7 +97,9 @@
           (?n "\\norm" nil t nil nil)
           (?a "\\abs" nil t nil nil)
           (?- "\\overline" nil t nil nil)
-          (?0 "\\text" nil t nil nil)))
+          ;; (?0 "\\text" nil t nil nil) % 't does the job
+	  )
+	)
 
   (setq cdlatex-env-alist
         '(
