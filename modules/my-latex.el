@@ -55,8 +55,8 @@
   (local-leader LaTeX-mode-map
     "P" 'preview-at-point
     "m" 'TeX-command-master
-    "C" 'TeX-command-run-all
-    "V" 'TeX-view
+    "c" 'TeX-command-run-all
+    "v" 'TeX-view
     )
 )
 
@@ -281,11 +281,11 @@
   (local-leader
     :keymaps '(LaTeX-mode-map)
     ";"  'reftex-toc
-    "R"  'reftex-reference
-    "c"  '(:ignore t :which-key "cite")
-    "cc" 'reftex-cite
-    "cp" 'reftex-citep
-    "ct" 'reftex-citet
+    "r"  '(:ignore t :which-key "ref&cite")
+    "rr"  'reftex-reference
+    "rc" 'reftex-cite
+    "rp" 'reftex-citep
+    "rt" 'reftex-citet
     )
   ;; (local-leader LaTeX-mode-map
   ;;     "r"   'reftex-reference)

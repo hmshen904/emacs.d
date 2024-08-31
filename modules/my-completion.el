@@ -76,7 +76,7 @@
   :general
   (leader
    "fr"  'consult-recent-file
-   ;; "bm"  'consult-buffer
+   "bb"  'consult-buffer
    "fL"  'consult-locate))
 
 (use-package embark-consult

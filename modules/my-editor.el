@@ -4,8 +4,8 @@
 
 (use-package evil
   :init
-  (setq evil-want-keybinding nil
-        evil-respect-visual-line-mode t
+  (setq evil-want-keybinding nil ;; https://github.com/emacs-evil/evil-collection/issues/60
+	evil-respect-visual-line-mode t
 	evil-undo-system 'undo-fu
 	evil-mode-line-format nil)
 
@@ -13,14 +13,17 @@
   (evil-want-C-u-scroll t) ;; allow scroll up with 'C-u'
   (evil-want-C-d-scroll t) ;; allow scroll down with 'C-d'
   :config
-  (evil-mode 1))
+  (fset 'evil-visual-update-x-selection-p 'ignore)
+  (setq evil-want-change-word-to-end nil
+	evil-kill-on-visual-paste nil
+	evil-want-keybinding nil)
+  (evil-mode 1)
+  )
 
 (use-package evil-collection
   :after evil
   :diminish
-  ;; :ensure t
-  ;; :custom
-  ;; (evil-collection-setup-minibuffer t)
+  :ensure t
   :config
   (evil-collection-init))
 
@@ -184,7 +187,7 @@
     "bq"  'kill-buffer-and-window
     "bR"  'rename-file-and-buffer
     "br"  'revert-buffer
-    "bB"  'switch-to-buffer
+    ;; "bB"  'switch-to-buffer ;; see consult-buffer
     "bi"  'ibuffer
 
     ;; Window operations
