@@ -74,13 +74,14 @@
   ;; (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
   (setq cdlatex-use-dollar-to-ensure-math nil)
   ;; (setq cdlatex-paired-parens "$([{|")
+  ;; see https://github.com/cdominik/cdlatex/blob/master/cdlatex.el for other defs
   (setq cdlatex-math-symbol-alist
         '(
           (?0 ("\\varnothing" "\\emptyset" ""))
-          (?{ ("\\min" "\\inf" ""))
-          (?} ("\\max" "\\sup" ""))
-          (?< ("\\subseteq" "\\subset" ""))
-          (?> ("\\supseteq" "\\supset" ""))
+          ;; (?{ ("\\min" "\\inf" ""))
+          ;; (?} ("\\max" "\\sup" ""))
+          ;; (?< ("\\subseteq" "\\subset" ""))
+          ;; (?> ("\\supseteq" "\\supset" ""))
           (?D  ("\\Delta" "\\nabla" "\\displaystyle"))
           (?f ("\\phi" "\\varphi" ""))
           (?F ("\\Phi" "" ""))
@@ -96,7 +97,8 @@
           (?B "\\mathbb" nil t nil nil)
           (?n "\\norm" nil t nil nil)
           (?a "\\abs" nil t nil nil)
-          (?- "\\overline" nil t nil nil)
+	  (?s "\\mathscr" nil t nil nil)
+          ;; (?- "\\overline" nil t nil nil) use T
           ;; (?0 "\\text" nil t nil nil) % 't does the job
 	  )
 	)

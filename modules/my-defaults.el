@@ -122,6 +122,15 @@
 
 (setq my-init-file my-org-inbox)
 
+;; source: https://gist.github.com/jstewart/7664823
+(defun my/notify-osx (title message)
+  (call-process "terminal-notifier"
+                nil 0 nil
+                "-group" "Emacs"
+                "-title" title
+                "-sender" "org.gnu.Emacs"
+                "-message" message))
+
 (use-package diminish)
 
 (when (file-exists-p my-init-file)

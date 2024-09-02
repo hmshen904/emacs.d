@@ -187,7 +187,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     (visual-line-mode))
 #+end_src
 
-** paths
+** my paths
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
   (setq my-config-dir "~/.config/emacs")
@@ -217,6 +217,20 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 
   (setq my-init-file my-org-inbox)
 #+end_src
+
+** my functions
+
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  ;; source: https://gist.github.com/jstewart/7664823
+  (defun my/notify-osx (title message)
+    (call-process "terminal-notifier"
+                  nil 0 nil
+                  "-group" "Emacs"
+                  "-title" title
+                  "-sender" "org.gnu.Emacs"
+                  "-message" message))
+#+end_src
+
 
 ** diminisher
 
@@ -858,7 +872,7 @@ From a stylistic perspective (completely personal preference) I:
     :general
     (leader
      "fr"  'consult-recent-file
-     "bb"  'consult-buffer
+     ;; "bb"  'consult-buffer
      "fL"  'consult-locate))
 
   (use-package embark-consult
@@ -1153,6 +1167,33 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
         (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max)))))
 #+end_src
 
+** org-mode Pomodoro
+
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package org-pomodoro
+    :ensure t
+    :commands (org-pomodoro)
+    :init
+    (defun my/notify-pomo-fin ()
+      (my/notify-osx "Pomodoro completed!" "Time for a break."))
+    (defun my/notify-break-fin ()
+      (my/notify-osx "Break finished!" "Ready for another?"))
+    (defun my/notify-long-break-fin ()
+      (my/notify-osx "Long break finished!" "Ready for another?"))
+    (defun my/notify-pomo-kill ()
+      (my/notify-osx "Pomodoro killed!" "One does not simply kill a pomodoro!!!"))
+    :hook
+    (org-pomodoro-finished . my/notify-pomo-fin)
+    (org-pomodoro-break-finished . my/notify-break-fin)
+    (org-pomodoro-long-break-finished . my/notify-long-break-fin)
+    (org-pomodoro-killed . my/notify-pomo-kill)
+    :config
+    (setq
+     org-pomodoro-length 105
+     org-pomodoro-short-break-length 15
+     )
+    (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))))
+#+end_src
 ** org-mode keymaps
 
 #+name: org-keymaps
@@ -1205,6 +1246,14 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
     "rc" 'org-refile-copy
 
     "a"   'org-archive-subtree
+
+    "c"  '(:ignore t :which-key "org-clock")
+    "ci" 'org-clock-in
+    "co" 'org-clock-out
+    "cc" 'org-clock-goto
+    "cm" 'org-clock-modify-effort-estimate
+    "cp" 'org-pomodoro
+    "cP" 'org-pomodoro-extend-last-clock
     )
 #+end_src
 
@@ -1644,13 +1693,14 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
     ;; (add-to-list 'cdlatex-parens-pairs '("\\(" . "\\)"))
     (setq cdlatex-use-dollar-to-ensure-math nil)
     ;; (setq cdlatex-paired-parens "$([{|")
+    ;; see https://github.com/cdominik/cdlatex/blob/master/cdlatex.el for other defs
     (setq cdlatex-math-symbol-alist
           '(
             (?0 ("\\varnothing" "\\emptyset" ""))
-            (?{ ("\\min" "\\inf" ""))
-            (?} ("\\max" "\\sup" ""))
-            (?< ("\\subseteq" "\\subset" ""))
-            (?> ("\\supseteq" "\\supset" ""))
+            ;; (?{ ("\\min" "\\inf" ""))
+            ;; (?} ("\\max" "\\sup" ""))
+            ;; (?< ("\\subseteq" "\\subset" ""))
+            ;; (?> ("\\supseteq" "\\supset" ""))
             (?D  ("\\Delta" "\\nabla" "\\displaystyle"))
             (?f ("\\phi" "\\varphi" ""))
             (?F ("\\Phi" "" ""))
@@ -1666,7 +1716,8 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
             (?B "\\mathbb" nil t nil nil)
             (?n "\\norm" nil t nil nil)
             (?a "\\abs" nil t nil nil)
-            (?- "\\overline" nil t nil nil)
+  	  (?s "\\mathscr" nil t nil nil)
+            ;; (?- "\\overline" nil t nil nil) use T
             ;; (?0 "\\text" nil t nil nil) % 't does the job
   	  )
   	)

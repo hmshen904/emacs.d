@@ -106,6 +106,14 @@
     "rc" 'org-refile-copy
   
     "a"   'org-archive-subtree
+  
+    "c"  '(:ignore t :which-key "org-clock")
+    "ci" 'org-clock-in
+    "co" 'org-clock-out
+    "cc" 'org-clock-goto
+    "cm" 'org-clock-modify-effort-estimate
+    "cp" 'org-pomodoro
+    "cP" 'org-pomodoro-extend-last-clock
     )
   :config
   (require 'ox-gfm nil t)
@@ -433,6 +441,30 @@
   		("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   
   )
+
+(use-package org-pomodoro
+  :ensure t
+  :commands (org-pomodoro)
+  :init
+  (defun my/notify-pomo-fin ()
+    (my/notify-osx "Pomodoro completed!" "Time for a break."))
+  (defun my/notify-break-fin ()
+    (my/notify-osx "Break finished!" "Ready for another?"))
+  (defun my/notify-long-break-fin ()
+    (my/notify-osx "Long break finished!" "Ready for another?"))
+  (defun my/notify-pomo-kill ()
+    (my/notify-osx "Pomodoro killed!" "One does not simply kill a pomodoro!!!"))
+  :hook
+  (org-pomodoro-finished . my/notify-pomo-fin)
+  (org-pomodoro-break-finished . my/notify-break-fin)
+  (org-pomodoro-long-break-finished . my/notify-long-break-fin)
+  (org-pomodoro-killed . my/notify-pomo-kill)
+  :config
+  (setq
+   org-pomodoro-length 105
+   org-pomodoro-short-break-length 15
+   )
+  (setq alert-user-configuration (quote ((((:category . "org-pomodoro")) libnotify nil)))))
 
 (use-package org-super-agenda
   :after org-agenda
