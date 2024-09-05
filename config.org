@@ -126,9 +126,12 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
           '(("\\*Help\\*" display-buffer-below-selected)))
 
     ;; relative line numbers
-    (with-eval-after-load 'display-line-numbers
-      (setq display-line-numbers-type 'relative
-            display-line-numbers-width-start t))
+    ;; (with-eval-after-load 'display-line-numbers
+    ;;   (setq display-line-numbers-type 'relative
+    ;;         display-line-numbers-width-start t))
+
+    ;; do not want line number because of ace-jump
+    (global-linum-mode 0)
 
     ;; tabs are evil
     (setq indent-tabs-mode nil)
@@ -231,7 +234,6 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
                   "-message" message))
 #+end_src
 
-
 ** diminisher
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
@@ -259,7 +261,6 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 #+end_src
 
 * The editor configurations (=my-editor.el=)
-
 ** evil configs
 
 #+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
@@ -273,7 +274,6 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   	evil-respect-visual-line-mode t
   	evil-undo-system 'undo-fu
   	evil-mode-line-format nil)
-
     :custom
     (evil-want-C-u-scroll t) ;; allow scroll up with 'C-u'
     (evil-want-C-d-scroll t) ;; allow scroll down with 'C-d'
@@ -282,8 +282,18 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     (setq evil-want-change-word-to-end nil
   	evil-kill-on-visual-paste nil
   	evil-want-keybinding nil)
+    ;; (evil-set-initial-state 'org-agenda-mode 'motion) this does not work properly
     (evil-mode 1)
     )
+
+  (use-package evil-org
+    :ensure t
+    :diminish
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 
   (use-package evil-collection
     :after evil
@@ -439,6 +449,7 @@ From a stylistic perspective (completely personal preference) I:
     (general-def
       "C-x x" 'eval-defun)
 
+
     (leader
 
       ""     nil
@@ -449,6 +460,9 @@ From a stylistic perspective (completely personal preference) I:
 
       ;; jumpers
       "j"   '(:ignore t :which-key "jump")
+      ;; https://www.reddit.com/r/emacs/comments/3e1ozx/acejumpmode_is_dead_long_live_avy/
+      "jj"  'avy-goto-word-1
+      "jl"  'avy-goto-line
       "jn"  'evilem-motion-next-visual-line
       "jp"  'evilem-motion-previous-visual-line
       "jt"  'evilem-motion-find-char-to
@@ -619,6 +633,33 @@ From a stylistic perspective (completely personal preference) I:
 #+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
   (defun remove-electric-indent-mode ()
     (electric-indent-local-mode -1))
+#+end_src
+
+** yasnippet
+
+#+begin_src emacs-lisp :tangle "modules/my-editor.el" :mkdirp yes
+  (use-package yasnippet
+    :ensure t
+    :hook ((org-mode
+  	  ;; text-mode
+            ;; prog-mode
+            ;; conf-mode
+            snippet-mode) . yas-minor-mode-on)
+    :init
+    (setq yas-snippet-dir "~/.emacs.d/snippets")
+    :config
+    ;; source https://stackoverflow.com/questions/10211730/insert-yasnippet-by-name
+    (defun yas/insert-by-name (name)
+      (flet ((dummy-prompt
+  	    (prompt choices &optional display-fn)
+  	    (declare (ignore prompt))
+  	    (or (find name choices :key display-fn :test #'string=)
+  		(throw 'notfound nil))))
+  	  (let ((yas/prompt-functions '(dummy-prompt)))
+  	    (catch 'notfound
+  	      (yas/insert-snippet t)))))
+    (yas-reload-all)
+    )
 #+end_src
 
 ** my-editor provider
@@ -872,7 +913,7 @@ From a stylistic perspective (completely personal preference) I:
     :general
     (leader
      "fr"  'consult-recent-file
-     ;; "bb"  'consult-buffer
+     "bB"  'consult-buffer
      "fL"  'consult-locate))
 
   (use-package embark-consult
@@ -1024,8 +1065,8 @@ From a stylistic perspective (completely personal preference) I:
 #+begin_src emacs-lisp :tangle no
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-          (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
-          (sequence "NEXT(n)" "INPROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
+          (sequence "❍(p)" "☐(T)" "[?](W)" "|" "☑(D)" "☒(C)")
+          (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
 
   ;; extend today for late sleepers
   ;; (setq org-extend-today-until 2)
@@ -1067,6 +1108,12 @@ From a stylistic perspective (completely personal preference) I:
 
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+  ;; org-agenda split on right
+  ;; https://emacs.stackexchange.com/questions/2513/how-to-get-org-agenda-to-prefer-split-window-right
+  (defadvice org-agenda (around split-vertically activate)
+    (let ((split-width-threshold 80))  ; or whatever width makes sense for you
+      ad-do-it))
 
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
@@ -1251,6 +1298,7 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
     "ci" 'org-clock-in
     "co" 'org-clock-out
     "cc" 'org-clock-goto
+    "cu" 'org-clock-update-time-maybe
     "cm" 'org-clock-modify-effort-estimate
     "cp" 'org-pomodoro
     "cP" 'org-pomodoro-extend-last-clock
@@ -1280,23 +1328,29 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
   	     '("t" "Todo [inbox]" entry
   	       (file+headline my-org-inbox "Tasks") "* TODO %i"))
 
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
+  ;; 	       "** Tasks [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
+
   (add-to-list 'org-capture-templates
-  	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	     '("d" "Diary" plain (function my/org-journal-find-location)
+  	       "daily\n"
   	       :immediate-finish t
   	       :jump-to-captured t))
 
-  (add-to-list 'org-capture-templates
-  	     '("j" "Diary" plain (function my/org-journal-find-location)
-  	       "** Daily Summary [/]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
-  	       :immediate-finish t
-  	       :jump-to-captured t))
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("d" "Diary" plain (function my/org-journal-find-location)
+  ;; 	       "daily\n\n** Daily Summary [/]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
 
-  (add-to-list 'org-capture-templates
-  	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "* Weekly Goals [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
-  	       :immediate-finish t
-  	       :jump-to-captured t))
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
+  ;; 	       "* Weekly Goals [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
 
   (add-to-list 'org-capture-templates
   	     '("p" "Proposal to write [inbox]" entry

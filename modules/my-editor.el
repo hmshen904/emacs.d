@@ -8,7 +8,6 @@
 	evil-respect-visual-line-mode t
 	evil-undo-system 'undo-fu
 	evil-mode-line-format nil)
-
   :custom
   (evil-want-C-u-scroll t) ;; allow scroll up with 'C-u'
   (evil-want-C-d-scroll t) ;; allow scroll down with 'C-d'
@@ -17,8 +16,18 @@
   (setq evil-want-change-word-to-end nil
 	evil-kill-on-visual-paste nil
 	evil-want-keybinding nil)
+  ;; (evil-set-initial-state 'org-agenda-mode 'motion) this does not work properly
   (evil-mode 1)
   )
+
+(use-package evil-org
+  :ensure t
+  :diminish
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
 (use-package evil-collection
   :after evil
@@ -148,6 +157,7 @@
   (general-def
     "C-x x" 'eval-defun)
 
+
   (leader
 
     ""     nil
@@ -158,6 +168,9 @@
 
     ;; jumpers
     "j"   '(:ignore t :which-key "jump")
+    ;; https://www.reddit.com/r/emacs/comments/3e1ozx/acejumpmode_is_dead_long_live_avy/
+    "jj"  'avy-goto-word-1
+    "jl"  'avy-goto-line
     "jn"  'evilem-motion-next-visual-line
     "jp"  'evilem-motion-previous-visual-line
     "jt"  'evilem-motion-find-char-to
@@ -311,5 +324,28 @@
 
 (defun remove-electric-indent-mode ()
   (electric-indent-local-mode -1))
+
+(use-package yasnippet
+  :ensure t
+  :hook ((org-mode
+	  ;; text-mode
+          ;; prog-mode
+          ;; conf-mode
+          snippet-mode) . yas-minor-mode-on)
+  :init
+  (setq yas-snippet-dir "~/.emacs.d/snippets")
+  :config
+  ;; source https://stackoverflow.com/questions/10211730/insert-yasnippet-by-name
+  (defun yas/insert-by-name (name)
+    (flet ((dummy-prompt
+	    (prompt choices &optional display-fn)
+	    (declare (ignore prompt))
+	    (or (find name choices :key display-fn :test #'string=)
+		(throw 'notfound nil))))
+	  (let ((yas/prompt-functions '(dummy-prompt)))
+	    (catch 'notfound
+	      (yas/insert-snippet t)))))
+  (yas-reload-all)
+  )
 
 (provide 'my-editor)

@@ -35,9 +35,12 @@
         '(("\\*Help\\*" display-buffer-below-selected)))
 
   ;; relative line numbers
-  (with-eval-after-load 'display-line-numbers
-    (setq display-line-numbers-type 'relative
-          display-line-numbers-width-start t))
+  ;; (with-eval-after-load 'display-line-numbers
+  ;;   (setq display-line-numbers-type 'relative
+  ;;         display-line-numbers-width-start t))
+
+  ;; do not want line number because of ace-jump
+  (global-linum-mode 0)
 
   ;; tabs are evil
   (setq indent-tabs-mode nil)

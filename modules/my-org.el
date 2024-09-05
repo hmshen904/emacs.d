@@ -111,6 +111,7 @@
     "ci" 'org-clock-in
     "co" 'org-clock-out
     "cc" 'org-clock-goto
+    "cu" 'org-clock-update-time-maybe
     "cm" 'org-clock-modify-effort-estimate
     "cp" 'org-pomodoro
     "cP" 'org-pomodoro-extend-last-clock
@@ -119,8 +120,8 @@
   (require 'ox-gfm nil t)
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-          (sequence "[.](T)" "[-](p)" "[?](m)" "|" "[X](D)")
-          (sequence "NEXT(n)" "INPROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
+          (sequence "❍(p)" "☐(T)" "[?](W)" "|" "☑(D)" "☒(C)")
+          (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
   
   ;; extend today for late sleepers
   ;; (setq org-extend-today-until 2)
@@ -162,6 +163,12 @@
   
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  
+  ;; org-agenda split on right
+  ;; https://emacs.stackexchange.com/questions/2513/how-to-get-org-agenda-to-prefer-split-window-right
+  (defadvice org-agenda (around split-vertically activate)
+    (let ((split-width-threshold 80))  ; or whatever width makes sense for you
+      ad-do-it))
   
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
@@ -265,23 +272,29 @@
   	     '("t" "Todo [inbox]" entry
   	       (file+headline my-org-inbox "Tasks") "* TODO %i"))
   
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
+  ;; 	       "** Tasks [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
+  
   (add-to-list 'org-capture-templates
-  	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "** Tasks [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  	     '("d" "Diary" plain (function my/org-journal-find-location)
+  	       "daily\n"
   	       :immediate-finish t
   	       :jump-to-captured t))
   
-  (add-to-list 'org-capture-templates
-  	     '("j" "Diary" plain (function my/org-journal-find-location)
-  	       "** Daily Summary [/]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
-  	       :immediate-finish t
-  	       :jump-to-captured t))
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("d" "Diary" plain (function my/org-journal-find-location)
+  ;; 	       "daily\n\n** Daily Summary [/]\n- [ ] DDLs are completed. \n- [ ] Org my life. \n- [ ] Enjoyed my day."
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
   
-  (add-to-list 'org-capture-templates
-  	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
-  	       "* Weekly Goals [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
-  	       :immediate-finish t
-  	       :jump-to-captured t))
+  ;; (add-to-list 'org-capture-templates
+  ;; 	     '("w" "Weekly Tasks in Journal" plain (function my/org-journal-find-location)
+  ;; 	       "* Weekly Goals [/]\nDDL: \n- [ ] \nRESEARCH: \n- [ ] \nCOURSES: \n- [ ] \nSERVICES: \n- [ ] \nOTHERS: \n- [ ]"
+  ;; 	       :immediate-finish t
+  ;; 	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
   	     '("p" "Proposal to write [inbox]" entry
