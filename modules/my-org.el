@@ -1,54 +1,3 @@
-(use-package org-journal
-  :init
-  ;; Change default prefix key; needs to be set before loading org-journal
-  ;; (setq org-journal-prefix-key "C-c j ")
-  (setq org-journal-dir my-journal-dir)
-
-  :config
-
-  (setq org-journal-file-type 'monthly)
-  (setq org-journal-file-format "%Y/month%m.org" ;;"%Y%m%d.org" "%Y/month%m-week%V.org"
-        org-journal-date-format "%b %e %Y (%A)"
-        org-journal-time-format ""
-        org-journal-start-on-weekday '7)
-
-  (defun my/org-journal-file-header-func (time)
-    "Custom function to create journal header."
-    (concat
-     (pcase org-journal-file-type
-       ;; (`daily "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
-       ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-       (`weekly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes\nWeekly Goals [%]\nRESEARCH:\n- [ ] \nCOURSES:\n- [ ] \nSERVICE:\n- [ ] \nOTHERS:\n- [ ] \n\n")
-       (`monthly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes")
-       ;; (`yearly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
-       )))
-
-  (setq org-journal-file-header 'my/org-journal-file-header-func)
-
-  ;; (defun get-journal-file-today ()
-  ;;   "Gets filename for today's journal entry."
-  ;;   (let ((daily-name (format-time-string "%Y%m")))
-  ;;     (expand-file-name (concat org-journal-dir daily-name ".org"))))
-
-  ;; (defun journal-file-today ()
-  ;;   "Creates and load a journal file based on today's date."
-  ;;   (interactive)
-  ;;   (find-file (get-journal-file-today)))
-
-  (defun journal-file-today ()
-    "Creates and load a journal file based on today's date."
-    (interactive)
-    (org-journal-open-current-journal-file))
-
-  (defun my/open-diary ()
-    (interactive)
-    "Open org-diary directly"
-    (journal-file-today))
-
-  (leader
-    "nd" 'my/open-diary)
-)
-
 (use-package ox-gfm)
 
 (use-package org
@@ -170,6 +119,8 @@
     (let ((split-width-threshold 80))  ; or whatever width makes sense for you
       ad-do-it))
   
+  (setq org-agenda-window-setup 'other-window)
+  
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
   
@@ -255,6 +206,102 @@
   	(replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))
       (save-excursion
         (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max)))))
+  (use-package org-journal
+    :init
+    ;; Change default prefix key; needs to be set before loading org-journal
+    ;; (setq org-journal-prefix-key "C-c j ")
+    (setq org-journal-dir my-journal-dir)
+  
+    :config
+  
+    (setq org-journal-file-type 'monthly)
+    (setq org-journal-file-format "%Y/month%m.org" ;;"%Y%m%d.org" "%Y/month%m-week%V.org"
+          org-journal-date-format "%b %e %Y (%A)"
+          org-journal-time-format ""
+          org-journal-start-on-weekday '7)
+  
+    (defun my/org-journal-file-header-func (time)
+      "Custom function to create journal header."
+      (concat
+       (pcase org-journal-file-type
+         ;; (`daily "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
+         ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+         (`weekly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes\nWeekly Goals [%]\nRESEARCH:\n- [ ] \nCOURSES:\n- [ ] \nSERVICE:\n- [ ] \nOTHERS:\n- [ ] \n\n")
+         (`monthly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+STARTUP: overview\n#+LaTeX_CLASS: notes")
+         ;; (`yearly "#+AUTHOR: Haoming Shen\n#+OPTIONS: author:nil date:nil title:nil toc:nil broken-links:t\n#+LaTeX_CLASS: notes")
+         )))
+  
+    (setq org-journal-file-header 'my/org-journal-file-header-func)
+  
+    (defun get-journal-file-today ()
+      "Gets filename for today's journal entry."
+      (let ((month-name (format-time-string "%m")))
+        (expand-file-name (concat org-journal-dir (format-time-string "/%Y/month") month-name ".org"))))
+  
+    ;; (defun get-journal-file-today ()
+    ;;   "Gets filename for today's journal entry."
+    ;;   (let ((daily-name (format-time-string "%Y%m")))
+    ;;     (expand-file-name (concat org-journal-dir daily-name ".org"))))
+  
+    ;; (defun journal-file-today ()
+    ;;   "Creates and load a journal file based on today's date."
+    ;;   (interactive)
+    ;;   (find-file (get-journal-file-today)))
+  
+    ;; source
+    ;; https://isamert.net/2021/01/25/how-i-do-keep-my-days-organized-with-org-mode-and-emacs.html
+    (defun my/toggle-side-journal-buffer ()
+      "Toggle `bullet.org` in a side buffer for quick note taking.  The buffer is opened in side window so it can't be accidentaly removed."
+      (interactive)
+      (my/toggle-side-buffer-with-file (get-journal-file-today)))
+  
+    (defun my/buffer-visible-p (buffer)
+      "Check if given BUFFER is visible or not.  BUFFER is a string representing the buffer name."
+      (or (eq buffer (window-buffer (selected-window))) (get-buffer-window buffer)))
+  
+    (defun my/display-buffer-in-side-window (buffer)
+      "Just like `display-buffer-in-side-window' but only takes a BUFFER and rest of the parameters are for my taste."
+      (select-window
+       (display-buffer-in-side-window
+        buffer
+        (list (cons 'side 'right)
+              (cons 'slot 0)
+              (cons 'window-width 84)
+              (cons 'window-parameters (list (cons 'no-delete-other-windows t)
+                                             (cons 'no-other-window nil)))))))
+  
+    (defun my/remove-window-with-buffer (the-buffer-name)
+      "Remove window containing given THE-BUFFER-NAME."
+      (mapc (lambda (window)
+              (when (string-equal (buffer-name (window-buffer window)) the-buffer-name)
+                (delete-window window)))
+            (window-list (selected-frame))))
+  
+    (defun my/toggle-side-buffer-with-file (file-path)
+      "Toggle FILE-PATH in a side buffer. The buffer is opened in side window so it can't be accidentaly removed."
+      (interactive)
+      (let ((fname (file-name-nondirectory file-path)))
+      (if (my/buffer-visible-p fname)
+          (my/remove-window-with-buffer fname)
+        (my/display-buffer-in-side-window
+         (save-window-excursion
+           (find-file file-path)
+           (current-buffer))))))
+  
+    (defun journal-file-today ()
+      "Creates and load a journal file based on today's date."
+      (interactive)
+      (org-journal-open-current-journal-file))
+  
+    (defun my/open-diary ()
+      (interactive)
+      "Open org-diary directly"
+      (journal-file-today))
+  
+    (leader
+      "nd" 'my/open-diary
+      "nt" 'my/toggle-side-journal-buffer)
+  )
   (setq org-capture-bookmark nil)
   
   (defun my/org-journal-find-location ()

@@ -6,12 +6,24 @@
   :init
   (setq TeX-parse-self t ; parse on load
         TeX-auto-save t  ; parse on save
+	TeX-command-extra-options "-shell-escape"
         TeX-source-correlate-mode t
         TeX-source-correlate-method 'synctex
-        TeX-source-correlate-start-server nil
+        TeX-source-correlate-start-server t ;; start server
         TeX-electric-sub-and-superscript t
-        TeX-engine 'xetex ;; use xelatex by default
+	LaTeX-indent-level 0
+        ;; TeX-engine 'xetex ;; use xelatex by default
         TeX-save-query nil)
+
+  (setq TeX-view-program-selection
+        '(
+          (output-pdf "Skim")
+	  (output-pdf "PDF Tools")
+          (output-dvi "open")
+          (output-pdf "open")
+          (output-html "open")
+          (output-pdf "preview-pane")))
+
 
   ;; (setq TeX-quote-after-quote t)
 

@@ -121,8 +121,8 @@
       (interactive)
       (load-theme 'leuven t)))
 
-(load-anti-zenburn)
-;; (load-leuven-light)
+;; (load-anti-zenburn)
+(load-leuven-light)
 (my/pad-mode-line)
 
 (provide 'my-ui)

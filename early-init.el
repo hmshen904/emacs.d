@@ -22,6 +22,7 @@
 
 ;; install use-package via straight
 (straight-use-package 'use-package)
+(straight-use-package 'org)
 
 (add-hook 'after-init-hook (lambda () (set-frame-name "home")))
 
