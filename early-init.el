@@ -22,7 +22,21 @@
 
 ;; install use-package via straight
 (straight-use-package 'use-package)
-(straight-use-package 'org)
+;; (straight-use-package 'org)
+(straight-use-package
+ '(org :type git
+       :host github
+       :repo "bzg/org-mode"
+       ;; :pin "ca873f7"
+       ;; :tag "release_9.6.7"
+       ))
+;; https://github.com/radian-software/straight.el?tab=readme-ov-file#how-do-i-pin-package-versions-or-use-only-tagged-releases
+
+;; (straight-use-package 'org)
+(straight-use-package 'org-contrib)
+;; Pin org-mode version.
+(add-to-list 'straight-x-pinned-packages
+             '("org" . "ca873f7fe47546bca19821f1578a6ab95bf5351c"))
 
 (add-hook 'after-init-hook (lambda () (set-frame-name "home")))
 

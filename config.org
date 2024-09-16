@@ -19,6 +19,7 @@ accordingly.
 (org-babel-tangle)
 #+end_src
 
+
 * The early initialisation of Emacs (=early-init.el=)
 
 This is the first file that Emacs reads when starting up. It should
@@ -26,6 +27,19 @@ contain code that does not depend on any package or the proportions of
 the Emacs frame. In general, this early initialisation file is meant
 to set up a few basic things before Emacs produces the initial frame
 by delegating to the =init.el=
+
+** Setup the default lockfile for pinned packages
+
+;; https://www.reddit.com/r/emacs/comments/z3v5xu/is_there_a_way_to_pin_a_package_to_a_specific/
+;; https://github.com/radian-software/straight.el?tab=readme-ov-file#lockfile-management
+
+#+begin_src emacs-lisp :tangle "straight/versions/default.el" :mkdirp yes
+  (
+   ("org" . "ca873f7fe47546bca19821f1578a6ab95bf5351c")
+   )
+  :gamma
+
+#+end_src
 
 ** The =early-init.el= initialises =straight.el= and =use-package.el=
 
@@ -54,7 +68,22 @@ by delegating to the =init.el=
 
   ;; install use-package via straight
   (straight-use-package 'use-package)
-  (straight-use-package 'org)
+  ;; (straight-use-package 'org)
+  (straight-use-package
+   '(org :type git
+         :host github
+         :repo "bzg/org-mode"
+         ;; :pin "ca873f7"
+         ;; :tag "release_9.6.7"
+         ))
+  ;; https://github.com/radian-software/straight.el?tab=readme-ov-file#how-do-i-pin-package-versions-or-use-only-tagged-releases
+
+  ;; (straight-use-package 'org)
+  (straight-use-package 'org-contrib)
+  ;; Pin org-mode version.
+  (add-to-list 'straight-x-pinned-packages
+               '("org" . "ca873f7fe47546bca19821f1578a6ab95bf5351c"))
+
 #+end_src
 
 ** The =early-init.el= gives a name to the default frame
@@ -282,8 +311,10 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     (fset 'evil-visual-update-x-selection-p 'ignore)
     (setq evil-want-change-word-to-end nil
   	evil-kill-on-visual-paste nil
-  	evil-want-keybinding nil)
+  	evil-want-keybinding nil
+  	evil-symbol-word-search t)
     ;; (evil-set-initial-state 'org-agenda-mode 'motion) this does not work properly
+
     (evil-mode 1)
     )
 
@@ -822,8 +853,8 @@ From a stylistic perspective (completely personal preference) I:
 *** default theme
 
 #+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
-  ;; (load-anti-zenburn)
-  (load-leuven-light)
+  (load-anti-zenburn)
+  ;; (load-leuven-light)
   (my/pad-mode-line)
 #+end_src
 
@@ -972,6 +1003,69 @@ From a stylistic perspective (completely personal preference) I:
     )
 #+end_src
 
+** tab bar
+
+#+begin_src emacs-lisp :tangle "modules/my-completion.el" :mkdirp yes
+  ;; (use-package tabbar
+  ;;   :ensure t
+  ;;   :after projectile
+  ;;   :config
+  ;;   (defun tabbar-buffer-groups ()
+  ;;     "Return the list of group names the current buffer belongs to.
+  ;; Return a list of one element based on major mode."
+  ;;     (list
+  ;;      (cond
+  ;;       ((or (get-buffer-process (current-buffer))
+  ;;            ;; Check if the major mode derives from `comint-mode' or
+  ;;            ;; `compilation-mode'.
+  ;;            (tabbar-buffer-mode-derived-p
+  ;;             major-mode '(comint-mode compilation-mode)))
+  ;;        "Process"
+  ;;        )
+  ;;       ((member (buffer-name)
+  ;;                '("*scratch*" "*Messages*" "*dashboard*" "TAGS"))
+  ;;        "Common"
+  ;;        )
+  ;;       ((eq major-mode 'dired-mode)
+  ;;        "Dired"
+  ;;        )
+  ;;       ((memq major-mode
+  ;;              '(help-mode apropos-mode Info-mode Man-mode))
+  ;;        "Help"
+  ;;        )
+  ;;       ((memq major-mode
+  ;;              '(rmail-mode
+  ;;                rmail-edit-mode vm-summary-mode vm-mode mail-mode
+  ;;                mh-letter-mode mh-show-mode mh-folder-mode
+  ;;                gnus-summary-mode message-mode gnus-group-mode
+  ;;                gnus-article-mode score-mode gnus-browse-killed-mode))
+  ;;        "Mail"
+  ;;        )
+  ;;     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;     ;;; Group tabs by projectile projects
+  ;;       ((memq (current-buffer)
+  ;;              (condition-case nil
+  ;;                  (projectile-buffers-with-file-or-process (projectile-project-buffers))
+  ;;                (error nil)))
+  ;;        (projectile-project-name)
+  ;;        )
+  ;;     ;;; end of hacking
+  ;;     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  ;;       (t
+  ;;        ;; Return `mode-name' if not blank, `major-mode' otherwise.
+  ;;        (if (and (stringp mode-name)
+  ;;                 ;; Take care of preserving the match-data because this
+  ;;                 ;; function is called when updating the header line.
+  ;;                 (save-match-data (string-match "[^ ]" mode-name)))
+  ;;            mode-name
+  ;;          (symbol-name major-mode))
+  ;;        ))))
+
+  ;;   (tabbar-mode )
+  ;;   )
+#+end_src
+
 * The org-mode configurations (=my-org.el=)
 
 ** markdown exporter
@@ -981,6 +1075,8 @@ From a stylistic perspective (completely personal preference) I:
 #+end_src
 
 ** org-mode config skeleton
+
+Org-mode was first loaded in early-init.el
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes :noweb no-export
   (use-package org
     :mode ("\\.org\\'" . org-mode)
@@ -988,6 +1084,10 @@ From a stylistic perspective (completely personal preference) I:
     (defun my-org-mode-hooks ()
       (visual-line-mode)
       (outline-minor-mode)
+      (push '("[ ]" .  "☐") prettify-symbols-alist)
+      (push '("[X]" . "☑" ) prettify-symbols-alist)
+      (push '("[-]" . "❍" ) prettify-symbols-alist)
+      (prettify-symbols-mode)
       (electric-pair-mode -1)) ;; electric-pair-mode has to be disabled other wise \( ... \) cannot be paired properly
     ;; (my-org-mode-hooks)
     :hook (org-mode . my-org-mode-hooks)
@@ -1012,7 +1112,7 @@ From a stylistic perspective (completely personal preference) I:
 #+begin_src emacs-lisp :tangle no
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-          (sequence "❍(p)" "☐(T)" "[?](W)" "|" "☑(D)" "☒(C)")
+          (sequence "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
 
   ;; extend today for late sleepers
@@ -1270,6 +1370,7 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
     (setq org-journal-file-format "%Y/month%m.org" ;;"%Y%m%d.org" "%Y/month%m-week%V.org"
           org-journal-date-format "%b %e %Y (%A)"
           org-journal-time-format ""
+  	org-journal-time-prefix ""
           org-journal-start-on-weekday '7)
 
     (defun my/org-journal-file-header-func (time)
@@ -1471,6 +1572,19 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
          ))
 
   (setq org-archive-location my-org-archive)
+
+  (require 'org-agenda)
+  (general-def org-agenda-mode-map
+    "RET" 'org-agenda-switch-to)
+
+  ;; (use-package org-agenda
+  ;;   :ensure nil ;; do not seek to install it, as it is builtin
+  ;;   ;; :config
+  ;;   ;; (general-def
+  ;;   ;;   :states 'motion
+  ;;   ;;   :keymaps '(org-agenda-mode-map)
+  ;;   ;;   "RET" 'org-agenda-switch-to)
+  ;;   )
 #+end_src
 ** org-mode latex
 
@@ -1579,7 +1693,9 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 
 #+end_src
 ** org-mode super agenda
+
 #+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+
   (use-package org-super-agenda
     :after org-agenda
     :init
@@ -1658,6 +1774,22 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
                     "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
                     "#+title: ${citar-citekey} (${citar-date}). ${note-title}.\n#+created: %U\n#+last_modified: %U\n\n")
                    :unnarrowed t)))
+#+end_src
+
+** org-ui
+
+#+begin_src emacs-lisp :tangle "modules/my-org.el" :mkdirp yes
+  (use-package org-bullets
+    :ensure t
+    :hook (org-mode . org-bullets-mode))
+
+  (use-package org-fancy-priorities
+    :diminish
+    :ensure t
+    :hook (org-mode . org-fancy-priorities-mode)
+    :config
+    (setq org-fancy-priorities-list '("🅰" "🅱" "🅲" "🅳" "🅴")))
+
 #+end_src
 
 ** anki editor

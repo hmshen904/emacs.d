@@ -35,9 +35,9 @@
   "pad my mode-line"
   (interactive)
   (set-face-attribute 'mode-line nil
-		      :box '(:line-width 4 :style flat-button))
+  		    :box '(:line-width 4 :style flat-button))
   (set-face-attribute 'mode-line-inactive nil
-		      :box '(:line-width 4 :style flat-button))
+  		    :box '(:line-width 4 :style flat-button))
   )
 
 (with-eval-after-load 'general
@@ -121,8 +121,8 @@
       (interactive)
       (load-theme 'leuven t)))
 
-;; (load-anti-zenburn)
-(load-leuven-light)
+(load-anti-zenburn)
+;; (load-leuven-light)
 (my/pad-mode-line)
 
 (provide 'my-ui)
