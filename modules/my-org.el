@@ -42,7 +42,7 @@
   
   (general-def
     :states 'motion
-    :keymaps '(org-mode-map org-agenda-mode-map)
+    :keymaps '(org-mode-map) ;; should not include org-agenda-mode-map here, otherwise [RET] would not switch to item!
     "RET" 'org-return
     )
   
