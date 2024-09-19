@@ -73,7 +73,7 @@
   (require 'ox-gfm nil t)
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-          (sequence "☐(T)" "|" "☑(D)" "☒(C)")
+          (sequence "❍(W)" "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
   
   ;; extend today for late sleepers
