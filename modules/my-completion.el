@@ -121,10 +121,10 @@
   :init
   (projectile-mode +1)
   (projectile-register-project-type 'latex '(".latexmkrc" "main.tex")
-  				  :compile "latexmk -pdf"
-  				  :test "latexmk -pdf"
-  				  :run "evince main.pdf"
-  				  :test-suffix ".tex")
+				    :compile "latexmk -pdf"
+				    :test "latexmk -pdf"
+				    :run "evince main.pdf"
+				    :test-suffix ".tex")
   )
 
 ;; (use-package tabbar

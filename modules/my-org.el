@@ -199,7 +199,7 @@
     (interactive)
     (if (region-active-p)
          (save-excursion
-         (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (region-beginning) (region-end)))
+  	 (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (region-beginning) (region-end)))
       (save-excursion
         (replace-regexp "\\$\\(.*?\\)\\$" "\\\\(\\1\\\\)" nil (point-min) (point-max)))))
   
@@ -207,7 +207,7 @@
     (interactive)
     (if (region-active-p)
         (save-excursion
-        (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))
+  	(replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (region-beginning) (region-end)))
       (save-excursion
         (replace-regexp "\\\\(\\(.*?\\)\\\\)" "$\\1$" nil (point-min) (point-max)))))
   (use-package org-journal
@@ -222,7 +222,7 @@
     (setq org-journal-file-format "%Y/month%m.org" ;;"%Y%m%d.org" "%Y/month%m-week%V.org"
           org-journal-date-format "%b %e %Y (%A)"
           org-journal-time-format ""
-        org-journal-time-prefix ""
+  	org-journal-time-prefix ""
           org-journal-start-on-weekday '7)
   
     (defun my/org-journal-file-header-func (time)
@@ -321,8 +321,8 @@
   (setq org-capture-templates nil)
   ;; push values into it
   (add-to-list 'org-capture-templates
-    	   '("t" "Todo [inbox]" entry
-    	     (file+headline my-org-inbox "Tasks") "* TODO %i"))
+  	     '("t" "Todo [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* TODO %i"))
   
   ;; (add-to-list 'org-capture-templates
   ;; 	     '("d" "Daily Tasks in Journal" plain (function my/org-journal-find-location)
@@ -331,10 +331,10 @@
   ;; 	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
-    	   '("d" "Diary" plain (function my/org-journal-find-location)
-    	     "daily\n"
-    	     :immediate-finish t
-    	     :jump-to-captured t))
+  	     '("d" "Diary" plain (function my/org-journal-find-location)
+  	       "daily\n"
+  	       :immediate-finish t
+  	       :jump-to-captured t))
   
   ;; (add-to-list 'org-capture-templates
   ;; 	     '("d" "Diary" plain (function my/org-journal-find-location)
@@ -349,22 +349,22 @@
   ;; 	       :jump-to-captured t))
   
   (add-to-list 'org-capture-templates
-    	   '("p" "Proposal to write [inbox]" entry
-    	     (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROPOSAL TITLE} [/]
+  	     '("p" "Proposal to write [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROPOSAL TITLE} [/]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
     :END:\n** WAITING Prep. the budget form\n** WAITING Literature Review [/]\n** WAITING Proposal Writing [/]\n** WAITING Supplementary Doc Prep. [/]"))
   
   (add-to-list 'org-capture-templates
-    	   '("r" "Research project [inbox]" entry
-    	     (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROJECT TITLE} [/]
+  	     '("r" "Research project [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{PROJECT TITLE} [/]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
     :END:\n** WAITING Literature review [/]\n** WAITING Research questions [/]\n** WAITING Paper writing [/]"))
   
   (add-to-list 'org-capture-templates
-    	   '("R" "Paper/Proposal to review [inbox]" entry
-    	     (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{TITLE} [%]
+  	     '("R" "Paper/Proposal to review [inbox]" entry
+  	       (file+headline my-org-inbox "Tasks") "* ACTIVE [%^{SHORT}] %^{TITLE} [%]
     :PROPERTIES:
     :COOKIE_DATA: todo recursive
     :END:\n** WAITING Submission overview\n** WAITING Submission evaluation[/]\n** WAITING Review letter writing [/]"))
@@ -372,21 +372,21 @@
   (defun my/opened-buffer-files ()
       "Return the list of files currently opened in emacs"
       (delq nil
-        (mapcar (lambda (x)
-    	      (if (and (buffer-file-name x)
-    			  (string-match "\\.org$"
-    				      (buffer-file-name x)))
-    		  (buffer-file-name x)))
-    	      (buffer-list))))
+  	(mapcar (lambda (x)
+  		(if (and (buffer-file-name x)
+  			    (string-match "\\.org$"
+  					(buffer-file-name x)))
+  		    (buffer-file-name x)))
+  		(buffer-list))))
   
   (setq org-refile-targets '((my-org-gtd :maxlevel . 3)
-    			 (my-org-projects :maxlevel . 3)
-    			 (my-org-reading :maxlevel . 3)
-    			 (my-org-proposals :maxlevel . 3)
-    			 (my-org-teaching :maxlevel . 3)
-    			 (my-org-misc :maxlevel . 3)
-    			 (my/opened-buffer-files :maxlevel . 9)
-    			 )
+  			   (my-org-projects :maxlevel . 3)
+  			   (my-org-reading :maxlevel . 3)
+  			   (my-org-proposals :maxlevel . 3)
+  			   (my-org-teaching :maxlevel . 3)
+  			   (my-org-misc :maxlevel . 3)
+  			   (my/opened-buffer-files :maxlevel . 9)
+  			   )
         )
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps nil)
@@ -423,21 +423,21 @@
       '("latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
   (setq org-latex-packages-alist
       (quote (("" "parskip" t)
-    	  ("" "amsmath" t)
-    	  ("" "amssymb" t)
-    	  ("" "amsthm" t)
-    	  ("" "amsfonts" t)
-    	  ("" "mathtools" t)
-    	  ("" "braket" t)
-    	  ("" "booktabs" t)
-    	  ("" "bbm" t)
-    	  ("" "listings" t)
-    	  ("" "algorithm2e" t)
-    	  ("" "xcolor" t)
-    	  ("" "mymacros" t))))
+  	    ("" "amsmath" t)
+  	    ("" "amssymb" t)
+  	    ("" "amsthm" t)
+  	    ("" "amsfonts" t)
+  	    ("" "mathtools" t)
+  	    ("" "braket" t)
+  	    ("" "booktabs" t)
+  	    ("" "bbm" t)
+  	    ("" "listings" t)
+  	    ("" "algorithm2e" t)
+  	    ("" "xcolor" t)
+  	    ("" "mymacros" t))))
   (add-to-list 'org-latex-classes
-    	     '("notes"
-    	      "\\documentclass[11pt]{article}
+  	       '("notes"
+  		"\\documentclass[11pt]{article}
   \\usepackage[normalem]{ulem}
   \\usepackage{booktabs}
   \\usepackage[inline, shortlabels]{enumitem}
@@ -451,12 +451,12 @@
   \\DefineBibliographyStrings{english}{backrefpage={page}, backrefpages={pages}}
   \\setlength\\parindent{0pt}
   \\setitemize{itemsep=1pt}"
-    	  ("\\section{%s}" . "\\section*{%s}")
-    	  ("\\subsection{%s}" . "\\subsection*{%s}")
-    	  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (add-to-list 'org-latex-classes
-    	  '("manuscripts"
-    	  "\\documentclass[11pt]{article}
+  	    '("manuscripts"
+  	    "\\documentclass[11pt]{article}
   \\usepackage[utf8]{inputenc}
   \\usepackage[T1]{fontenc}
   \\usepackage[normalem]{ulem}
@@ -473,12 +473,12 @@
   \\intervalconfig{soft open fences}
   \\setlength\\parindent{0pt}
   \\setitemize{itemsep=1pt}"
-    	  ("\\section{%s}" . "\\section*{%s}")
-    	  ("\\subsection{%s}" . "\\subsection*{%s}")
-    	  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   (add-to-list 'org-latex-classes
-    	  '("slides"
-    	      "\\documentclass[notheorems]{beamer}
+  	    '("slides"
+  		"\\documentclass[notheorems]{beamer}
   \\usepackage[utf8]{inputenc}
   \\usepackage[T1]{fontenc}
   \\usepackage[normalem]{ulem}
@@ -489,22 +489,22 @@
   \\usepackage{pgfpages}
   %%%% configs
   \\setlength\\parindent{0pt}"
-    	  ("\\section{%s}" . "\\section*{%s}")
-    	  ("\\subsection{%s}" . "\\subsection*{%s}")
-    	  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   
   (add-to-list 'org-latex-classes
-    	  '("moderncv"
-    	  "\\documentclass{moderncv}
+  	    '("moderncv"
+  	    "\\documentclass{moderncv}
   [NO-DEFAULT-PACKAGES]
   [NO-PACKAGES]"
-    	  ("\\section{%s}" . "\\section*{%s}")
-    	  ("\\subsection{%s}" . "\\subsection*{%s}")
-    	  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  	    ("\\section{%s}" . "\\section*{%s}")
+  	    ("\\subsection{%s}" . "\\subsection*{%s}")
+  	    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   
   (add-to-list 'org-latex-classes
-    	   '("annual report"
-    	      "\\documentclass{article}
+  	     '("annual report"
+  		"\\documentclass{article}
   \\usepackage[utf8]{inputenc}
   \\usepackage[T1]{fontenc}
   \\usepackage[normalem]{ulem}
@@ -514,9 +514,9 @@
   \\usepackage[inline]{enumitem}
   \\usepackage{hyperref}
   "
-    	      ("\\section{%s}" . "\\section*{%s}")
-    	      ("\\subsection{%s}" . "\\subsection*{%s}")
-    	      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  		("\\section{%s}" . "\\section*{%s}")
+  		("\\subsection{%s}" . "\\subsection*{%s}")
+  		("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
   
   )
 
@@ -588,10 +588,10 @@
   (org-roam-completion-everywhere t)
   :config
   (setq org-roam-node-display-template
-      (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+	(concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (setq org-roam-capture-templates
-      '(("d" "default" plain "%?"
-  	 :target (file+head "%<%Y%m%d%H%M>-${slug}.org"
+	'(("d" "default" plain "%?"
+	   :target (file+head "%<%Y%m%d%H%M>-${slug}.org"
                           "#+TITLE: ${title}\n#+DATE: \n#+AUTHOR: Haoming Shen \n#+OPTIONS: author:nil date:nil title:nil toc:nil\n#+LaTeX_CLASS: notes\n#+LaTeX_HEADER: \\addbibresource{master.bib}")
        :unnarrowed t)))
   (org-roam-db-autosync-mode)

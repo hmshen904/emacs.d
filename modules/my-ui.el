@@ -35,10 +35,13 @@
   "pad my mode-line"
   (interactive)
   (set-face-attribute 'mode-line nil
-  		    :box '(:line-width 4 :style flat-button))
+		      :box '(:line-width 4 :style flat-button))
   (set-face-attribute 'mode-line-inactive nil
-  		    :box '(:line-width 4 :style flat-button))
+		      :box '(:line-width 4 :style flat-button))
   )
+
+(add-to-list 'frameset-filter-alist '(ns-transparent-titlebar . t))
+(add-to-list 'frameset-filter-alist '(ns-appearance . dark))
 
 (with-eval-after-load 'general
   (defun disable-all-themes ()

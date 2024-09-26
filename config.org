@@ -754,6 +754,11 @@ From a stylistic perspective (completely personal preference) I:
 
 ** themes
 
+*** title bar
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+(add-to-list 'frameset-filter-alist '(ns-transparent-titlebar . t))
+(add-to-list 'frameset-filter-alist '(ns-appearance . dark))
+#+end_src
 *** theme cycling
 #+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
   (with-eval-after-load 'general

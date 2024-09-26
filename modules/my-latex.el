@@ -6,19 +6,19 @@
   :init
   (setq TeX-parse-self t ; parse on load
         TeX-auto-save t  ; parse on save
-      TeX-command-extra-options "-shell-escape"
+	TeX-command-extra-options "-shell-escape"
         TeX-source-correlate-mode t
         TeX-source-correlate-method 'synctex
         TeX-source-correlate-start-server t ;; start server
         TeX-electric-sub-and-superscript t
-      LaTeX-indent-level 0
+	LaTeX-indent-level 0
         ;; TeX-engine 'xetex ;; use xelatex by default
         TeX-save-query nil)
 
   (setq TeX-view-program-selection
         '(
           (output-pdf "Skim")
-  	(output-pdf "PDF Tools")
+	  (output-pdf "PDF Tools")
           (output-dvi "open")
           (output-pdf "open")
           (output-html "open")
@@ -28,13 +28,13 @@
   ;; (setq TeX-quote-after-quote t)
 
   (setq TeX-view-program-list
-      '(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
-  	("PDF Tools" TeX-pdf-tools-sync-view)
-  	("preview-pane" latex-preview-pane-mode)))
+	'(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+	  ("PDF Tools" TeX-pdf-tools-sync-view)
+	  ("preview-pane" latex-preview-pane-mode)))
 
   (setq TeX-view-program-selection
         '((output-pdf "Skim")
-  	(output-pdf "PDF Tools")
+	  (output-pdf "PDF Tools")
           (output-dvi "open")
           (output-pdf "open")
           (output-html "open")
@@ -57,7 +57,7 @@
     (prettify-symbols-mode))
   (add-hook 'LaTeX-mode-hook 'my-LaTeX-mode-hooks)
   (add-hook 'TeX-after-compilation-finished-functions
-  	  #'TeX-revert-document-buffer)
+	    #'TeX-revert-document-buffer)
   (add-to-list 'TeX-view-program-selection '(output-pdf "PDF Tools"))
 
   ;; (setq TeX-electric-math (cons "\\(" "\\)"))
@@ -109,11 +109,11 @@
           (?B "\\mathbb" nil t nil nil)
           (?n "\\norm" nil t nil nil)
           (?a "\\abs" nil t nil nil)
-  	(?s "\\mathscr" nil t nil nil)
+	  (?s "\\mathscr" nil t nil nil)
           ;; (?- "\\overline" nil t nil nil) use T
           ;; (?0 "\\text" nil t nil nil) % 't does the job
-  	)
-      )
+	  )
+	)
 
   (setq cdlatex-env-alist
         '(
@@ -179,11 +179,11 @@
    `((file "⌘" . " ") (note "✎" . " ") (link "⚓" . " ")))
   (setq citar-at-point-function 'embark-act)
   (setq citar-templates
-      '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
-  	(suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
-  	(preview . "${author::%etal} (${date year issued:4}) ${title}\n")
-  	(default-preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
-  	(note . "Notes on ${author editor:%etal}, ${title}")))
+	'((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
+	  (suffix . "          ${=key= id:15}    ${=type=:12}    ${tags keywords keywords:*}")
+	  (preview . "${author::%etal} (${date year issued:4}) ${title}\n")
+	  (default-preview . "${author editor:%etal} (${year issued date}) ${title}, ${journal journaltitle publisher container-title collection-title}.\n")
+	  (note . "Notes on ${author editor:%etal}, ${title}")))
 
   (with-eval-after-load 'oc
     (setq org-cite-insert-processor 'citar)
@@ -291,7 +291,7 @@
   :config
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)   ; with AUCTeX LaTeX mode
   (setq reftex-plug-into-AUCTeX t
-      reftex-default-bibliography (symbol-value 'my-bib-files))
+	reftex-default-bibliography (symbol-value 'my-bib-files))
   (local-leader
     :keymaps '(LaTeX-mode-map)
     ";"  'reftex-toc
