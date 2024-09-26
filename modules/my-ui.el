@@ -40,8 +40,10 @@
 		      :box '(:line-width 4 :style flat-button))
   )
 
-(add-to-list 'frameset-filter-alist '(ns-transparent-titlebar . t))
-(add-to-list 'frameset-filter-alist '(ns-appearance . dark))
+(setq ns-auto-hide-menu-bar t)
+(set-frame-position nil 0 -24)
+(tool-bar-mode 0)
+(set-frame-size nil 150 80)
 
 (with-eval-after-load 'general
   (defun disable-all-themes ()

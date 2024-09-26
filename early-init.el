@@ -26,10 +26,7 @@
 (straight-use-package
  '(org :type git
        :host github
-       :repo "bzg/org-mode"
-       ;; :pin "ca873f7"
-       ;; :tag "release_9.6.7"
-       ))
+       :repo "bzg/org-mode"))
 ;; https://github.com/radian-software/straight.el?tab=readme-ov-file#how-do-i-pin-package-versions-or-use-only-tagged-releases
 
 ;; (straight-use-package 'org)
@@ -37,6 +34,9 @@
 ;; Pin org-mode version.
 (add-to-list 'straight-x-pinned-packages
              '("org" . "ca873f7fe47546bca19821f1578a6ab95bf5351c"))
+
+;; need the following line, otherwise the fresh installation would fail
+(use-package dash :ensure t)
 
 (add-hook 'after-init-hook (lambda () (set-frame-name "home")))
 
