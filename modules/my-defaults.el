@@ -40,7 +40,7 @@
   ;;         display-line-numbers-width-start t))
 
   ;; do not want line number because of ace-jump
-  (global-linum-mode 0)
+  ;; (global-linum-mode 0)
 
   ;; tabs are evil
   (setq indent-tabs-mode nil)
