@@ -1164,6 +1164,8 @@ Org-mode was first loaded in early-init.el
 
   (setq org-agenda-window-setup 'other-window)
 
+  ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
+  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
 
