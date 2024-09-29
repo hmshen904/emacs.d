@@ -161,7 +161,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     ;;         display-line-numbers-width-start t))
 
     ;; do not want line number because of ace-jump
-    ;; (global-linum-mode 0)
+    (global-display-line-numbers-mode 0)
 
     ;; tabs are evil
     (setq indent-tabs-mode nil)
@@ -760,6 +760,12 @@ From a stylistic perspective (completely personal preference) I:
   (set-frame-position nil 0 -24)
   (tool-bar-mode 0)
   (set-frame-size nil 150 80)
+
+  ;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+  ;; (setq ns-use-proxy-icon nil)
+  ;; (setq frame-title-format nil)
 #+end_src
 *** theme cycling
 #+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
@@ -1118,7 +1124,7 @@ Org-mode was first loaded in early-init.el
 #+name: org-general
 #+begin_src emacs-lisp :tangle no
   (setq org-todo-keywords
-        '((sequence "ACTIVE(a)" "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
+        '((sequence "ACTIVE(a)" "WAITING(w)" "TODO(t)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
           (sequence "❍(W)" "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
 

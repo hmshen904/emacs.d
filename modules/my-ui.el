@@ -45,6 +45,12 @@
 (tool-bar-mode 0)
 (set-frame-size nil 150 80)
 
+;; (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+;; (setq ns-use-proxy-icon nil)
+;; (setq frame-title-format nil)
+
 (with-eval-after-load 'general
   (defun disable-all-themes ()
     "disable all active themes."
