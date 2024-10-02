@@ -167,6 +167,7 @@
     "h"   (general-simulate-key "C-h")
     "x"   (general-simulate-key "C-x")
     "u"   '(universal-argument :wk "C-u")
+    "RET" 'bookmark-bmenu-list
 
     ;; jumpers
     "j"   '(:ignore t :which-key "jump")
@@ -232,7 +233,6 @@
     "fl"  'find-file-literally
     "fR"  'rename-file-and-buffer
     "fs"  'save-buffer
-    "RET" 'bookmark-bmenu-list
 
     ;; Org mode
 
@@ -330,7 +330,7 @@
 (use-package yasnippet
   :ensure t
   :hook ((org-mode
-	  ;; text-mode
+	  text-mode
           ;; prog-mode
           ;; conf-mode
           snippet-mode) . yas-minor-mode-on)

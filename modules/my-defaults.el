@@ -100,10 +100,10 @@
 
 (setq my-config-dir "~/.config/emacs")
 (setq my-org-dir "~/Dropbox/org")
-(setq my-tex-local-path "~/Dropbox/50-scripts/texmf/tex/latex/local")
-(setq my-paper-dir "~/Dropbox/14-papers")
-(setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/55-software/Zotero/styles"))
-(setq my-org-roam-dir "~/Dropbox/13-notes/roam")
+(setq my-tex-local-path "~/.dotfiles/latex")
+(setq my-paper-dir "~/Dropbox/12-papers")
+(setq my-cite-csl-styles-dir (expand-file-name "~/Software/Zotero/styles"))
+(setq my-org-roam-dir "~/Dropbox/11-notes/roam")
 
 (setq my-config-file (concat (file-name-as-directory my-config-dir) "config.org"))
 (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))

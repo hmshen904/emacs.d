@@ -136,4 +136,10 @@
 ;; (load-leuven-light)
 (my/pad-mode-line)
 
+(require'dired)
+(setf dired-kill-when-opening-new-dired-buffer t) ;; only open one buffer (need emacs 28+)
+;; Additional configurations
+(setq dired-listing-switches "-alh")  ;; Show human-readable file sizes
+(setq dired-dwim-target t)  ;; Enable "do what I mean" for copying and moving files
+
 (provide 'my-ui)

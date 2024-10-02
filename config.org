@@ -225,10 +225,10 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
   (setq my-config-dir "~/.config/emacs")
   (setq my-org-dir "~/Dropbox/org")
-  (setq my-tex-local-path "~/Dropbox/50-scripts/texmf/tex/latex/local")
-  (setq my-paper-dir "~/Dropbox/14-papers")
-  (setq my-cite-csl-styles-dir (expand-file-name "~/Dropbox/55-software/Zotero/styles"))
-  (setq my-org-roam-dir "~/Dropbox/13-notes/roam")
+  (setq my-tex-local-path "~/.dotfiles/latex")
+  (setq my-paper-dir "~/Dropbox/12-papers")
+  (setq my-cite-csl-styles-dir (expand-file-name "~/Software/Zotero/styles"))
+  (setq my-org-roam-dir "~/Dropbox/11-notes/roam")
 
   (setq my-config-file (concat (file-name-as-directory my-config-dir) "config.org"))
   (setq my-init-file (concat (file-name-as-directory my-config-dir) "init.el"))
@@ -489,6 +489,7 @@ From a stylistic perspective (completely personal preference) I:
       "h"   (general-simulate-key "C-h")
       "x"   (general-simulate-key "C-x")
       "u"   '(universal-argument :wk "C-u")
+      "RET" 'bookmark-bmenu-list
 
       ;; jumpers
       "j"   '(:ignore t :which-key "jump")
@@ -554,7 +555,6 @@ From a stylistic perspective (completely personal preference) I:
       "fl"  'find-file-literally
       "fR"  'rename-file-and-buffer
       "fs"  'save-buffer
-      "RET" 'bookmark-bmenu-list
 
       ;; Org mode
 
@@ -673,7 +673,7 @@ From a stylistic perspective (completely personal preference) I:
   (use-package yasnippet
     :ensure t
     :hook ((org-mode
-  	  ;; text-mode
+  	  text-mode
             ;; prog-mode
             ;; conf-mode
             snippet-mode) . yas-minor-mode-on)
@@ -869,6 +869,16 @@ From a stylistic perspective (completely personal preference) I:
   (load-anti-zenburn)
   ;; (load-leuven-light)
   (my/pad-mode-line)
+#+end_src
+
+** dired file management
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+  (require'dired)
+  (setf dired-kill-when-opening-new-dired-buffer t) ;; only open one buffer (need emacs 28+)
+  ;; Additional configurations
+  (setq dired-listing-switches "-alh")  ;; Show human-readable file sizes
+  (setq dired-dwim-target t)  ;; Enable "do what I mean" for copying and moving files
 #+end_src
 
 ** my-ui provider
