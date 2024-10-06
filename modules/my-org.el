@@ -117,13 +117,8 @@
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   
-  ;; org-agenda split on right
-  ;; https://emacs.stackexchange.com/questions/2513/how-to-get-org-agenda-to-prefer-split-window-right
-  (defadvice org-agenda (around split-vertically activate)
-    (let ((split-width-threshold 80))  ; or whatever width makes sense for you
-      ad-do-it))
-  
-  (setq org-agenda-window-setup 'other-window)
+  ;; org-agenda split on right # DOES not work sadly
+  (setq org-agenda-window-setup 'reorganize-frame)
   
   ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
   (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
@@ -410,15 +405,6 @@
   (require 'org-agenda)
   (general-def org-agenda-mode-map
     "RET" 'org-agenda-switch-to)
-  
-  ;; (use-package org-agenda
-  ;;   :ensure nil ;; do not seek to install it, as it is builtin
-  ;;   ;; :config
-  ;;   ;; (general-def
-  ;;   ;;   :states 'motion
-  ;;   ;;   :keymaps '(org-agenda-mode-map)
-  ;;   ;;   "RET" 'org-agenda-switch-to)
-  ;;   )
   (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
   (setq org-e-latex-tables-booktabs t)
   (setq org-latex-pdf-process

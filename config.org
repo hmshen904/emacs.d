@@ -1179,13 +1179,8 @@ Org-mode was first loaded in early-init.el
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-  ;; org-agenda split on right
-  ;; https://emacs.stackexchange.com/questions/2513/how-to-get-org-agenda-to-prefer-split-window-right
-  (defadvice org-agenda (around split-vertically activate)
-    (let ((split-width-threshold 80))  ; or whatever width makes sense for you
-      ad-do-it))
-
-  (setq org-agenda-window-setup 'other-window)
+  ;; org-agenda split on right # DOES not work sadly
+  (setq org-agenda-window-setup 'reorganize-frame)
 
   ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
   (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
@@ -1601,15 +1596,6 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
   (require 'org-agenda)
   (general-def org-agenda-mode-map
     "RET" 'org-agenda-switch-to)
-
-  ;; (use-package org-agenda
-  ;;   :ensure nil ;; do not seek to install it, as it is builtin
-  ;;   ;; :config
-  ;;   ;; (general-def
-  ;;   ;;   :states 'motion
-  ;;   ;;   :keymaps '(org-agenda-mode-map)
-  ;;   ;;   "RET" 'org-agenda-switch-to)
-  ;;   )
 #+end_src
 ** org-mode latex
 
@@ -2018,6 +2004,8 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
           cdlatex-command-alist
           '(
             ("cmtb" "Insert Comment Box" "" cdlatex-environment ("comment box") t nil)
+            ;; ("im" "Insert \\Set{}" "\\(?\\)" cdlatex-position-cursor nil nil t)
+            ;; ("dm" "Insert \\Set{}" "\\[?\\]" cdlatex-position-cursor nil nil t)
             ("Set" "Insert \\Set{}" "\\Set{?}" cdlatex-position-cursor nil nil t)
             ("set" "Insert \\set{}" "\\set{?}" cdlatex-position-cursor nil nil t)
             ("para" "Insert \\paragraph{}" "\\paragraph{?}" cdlatex-position-cursor nil t nil)

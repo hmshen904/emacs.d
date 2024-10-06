@@ -137,6 +137,8 @@
         cdlatex-command-alist
         '(
           ("cmtb" "Insert Comment Box" "" cdlatex-environment ("comment box") t nil)
+          ;; ("im" "Insert \\Set{}" "\\(?\\)" cdlatex-position-cursor nil nil t)
+          ;; ("dm" "Insert \\Set{}" "\\[?\\]" cdlatex-position-cursor nil nil t)
           ("Set" "Insert \\Set{}" "\\Set{?}" cdlatex-position-cursor nil nil t)
           ("set" "Insert \\set{}" "\\set{?}" cdlatex-position-cursor nil nil t)
           ("para" "Insert \\paragraph{}" "\\paragraph{?}" cdlatex-position-cursor nil t nil)
