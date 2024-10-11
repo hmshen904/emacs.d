@@ -117,11 +117,6 @@
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
   
-  ;; org-agenda split on right # DOES not work sadly
-  (setq org-agenda-window-setup 'reorganize-frame)
-  
-  ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
-  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
   
@@ -221,6 +216,9 @@
           org-journal-time-format ""
   	org-journal-time-prefix ""
           org-journal-start-on-weekday '7)
+  
+    (setq org-journal-find-file #'find-file)
+  
   
     (defun my/org-journal-file-header-func (time)
       "Custom function to create journal header."
@@ -405,6 +403,19 @@
   (require 'org-agenda)
   (general-def org-agenda-mode-map
     "RET" 'org-agenda-switch-to)
+  
+  ;; org-agenda split on right # DOES not work sadly
+  (defadvice org-agenda (around split-vertically activate)
+    (let ((split-width-threshold 40)    ; or whatever width makes sense for you
+          (split-height-threshold nil)) ; but never horizontally
+      ad-do-it))
+  
+  ;; (setq org-agenda-window-setup 'reorganize-frame)
+  
+  ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
+  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
+  
+  
   (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
   (setq org-e-latex-tables-booktabs t)
   (setq org-latex-pdf-process

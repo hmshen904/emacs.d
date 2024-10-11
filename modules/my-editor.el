@@ -17,8 +17,7 @@
 	evil-kill-on-visual-paste nil
 	evil-want-keybinding nil
 	evil-symbol-word-search t)
-  ;; (evil-set-initial-state 'org-agenda-mode 'motion) this does not work properly
-
+  ;; (evil-set-initial-state 'org-agenda-mode 'normal) ;; this does not work properly
   (evil-mode 1)
   )
 
@@ -29,7 +28,8 @@
   :hook (org-mode . (lambda () evil-org-mode))
   :config
   (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
+  (evil-org-agenda-set-keys)
+  )
 
 (use-package evil-collection
   :after evil

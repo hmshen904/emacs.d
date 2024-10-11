@@ -262,6 +262,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
                   "-title" title
                   "-sender" "org.gnu.Emacs"
                   "-message" message))
+
 #+end_src
 
 ** diminisher
@@ -313,8 +314,7 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   	evil-kill-on-visual-paste nil
   	evil-want-keybinding nil
   	evil-symbol-word-search t)
-    ;; (evil-set-initial-state 'org-agenda-mode 'motion) this does not work properly
-
+    ;; (evil-set-initial-state 'org-agenda-mode 'normal) ;; this does not work properly
     (evil-mode 1)
     )
 
@@ -325,7 +325,8 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
     :hook (org-mode . (lambda () evil-org-mode))
     :config
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+    (evil-org-agenda-set-keys)
+    )
 
   (use-package evil-collection
     :after evil
@@ -1179,11 +1180,6 @@ Org-mode was first loaded in early-init.el
   ;; https://emacs.stackexchange.com/questions/50667/org-mode-auto-fill-mode
   ;; (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-  ;; org-agenda split on right # DOES not work sadly
-  (setq org-agenda-window-setup 'reorganize-frame)
-
-  ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
-  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
   ;; https://stackoverflow.com/questions/11365739/how-to-cancel-the-hypersetup-in-0rg-mode-of-emacs
   (setq org-latex-with-hyperref nil)
 
@@ -1393,6 +1389,9 @@ regex for uncanvasify \\(\(.*?\)\\) -> $\1$
   	org-journal-time-prefix ""
           org-journal-start-on-weekday '7)
 
+    (setq org-journal-find-file #'find-file)
+
+
     (defun my/org-journal-file-header-func (time)
       "Custom function to create journal header."
       (concat
@@ -1596,6 +1595,19 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
   (require 'org-agenda)
   (general-def org-agenda-mode-map
     "RET" 'org-agenda-switch-to)
+
+  ;; org-agenda split on right # DOES not work sadly
+  (defadvice org-agenda (around split-vertically activate)
+    (let ((split-width-threshold 40)    ; or whatever width makes sense for you
+          (split-height-threshold nil)) ; but never horizontally
+      ad-do-it))
+
+  ;; (setq org-agenda-window-setup 'reorganize-frame)
+
+  ;; https://emacs.stackexchange.com/questions/477/how-do-i-automatically-save-org-mode-buffers
+  (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
+
+
 #+end_src
 ** org-mode latex
 
