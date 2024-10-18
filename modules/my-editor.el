@@ -247,10 +247,14 @@
     ;; Applications
     ":"   'shell-command
     ";"   'eval-expression
+
     "a"   '(:ignore t :which-key "Applications")
     "ac"  'calendar
     "at"  'open-iTerm-here
     "af"  'open-Finder-here
+
+    "o"   '(:ignore t :which-key "Open...")
+    "of"  'make-frame
 
     "wh"  'evil-window-left
     "wl"  'evil-window-right

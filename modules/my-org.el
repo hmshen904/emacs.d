@@ -48,17 +48,18 @@
   
   (local-leader
     :keymaps 'org-mode-map
-    "t"  '(:ignore t :which-key "org-entry")
-    "ta" 'org-archive-subtree
-    "tP" 'org-set-property
-    "tp" 'org-priority
-    "tt" 'org-todo
+  
+    ;; "t"  '(:ignore t :which-key "org-entry")
+    ;; "tp" 'org-priority use shift + arrow keys instead
+  
+    "t" 'org-todo
   
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
     "rc" 'org-refile-copy
   
     "a"   'org-archive-subtree
+    "p"   'org-set-property
   
     "c"  '(:ignore t :which-key "org-clock")
     "ci" 'org-clock-in
