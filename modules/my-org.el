@@ -6,7 +6,7 @@
   (defun my-org-mode-hooks ()
     (visual-line-mode)
     (outline-minor-mode)
-    (push '("[ ]" .  "☐") prettify-symbols-alist)
+    (push '("[ ]" . "☐") prettify-symbols-alist)
     (push '("[X]" . "☑" ) prettify-symbols-alist)
     (push '("[-]" . "❍" ) prettify-symbols-alist)
     (prettify-symbols-mode)
@@ -74,6 +74,7 @@
   (require 'ox-gfm nil t)
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "WAITING(w)" "TODO(t)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
+  	(sequence "TORATE(R)" "|" "ಠ╭╮ಠ"  "\ (•◡•) /" "ಠ_ಥ")
           (sequence "❍(W)" "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
   
@@ -99,6 +100,11 @@
   
   ;; Start week on Sunday (not following the ISO standard)
   (setq org-agenda-start-on-weekday 7)
+  
+  ;; Source: https://emacs.stackexchange.com/questions/17302/is-there-a-way-to-make-org-mode-count-repetitive-tasks-done-certain-hours-past-m
+  ;;
+  (setq org-extend-today-until 5  ;; Treat 4 AM as the time when the following day begins (instead of midnight)
+        org-use-effective-time t) ;; If you're up at say 1 AM like me right now, treat the time when you mark a TODO as done as 23:59 of the previous day, sensu stricto
   
   ;; use mm-dd-yyyy
   (setq org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>"))
