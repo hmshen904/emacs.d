@@ -74,7 +74,8 @@
   (require 'ox-gfm nil t)
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "WAITING(w)" "TODO(t)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-  	(sequence "TORATE(R)" "|" "ಠ╭╮ಠ"  "\ (•◡•) /" "ಠ_ಥ")
+  	(sequence "TORATE(R)" "|" "\/ (¬_¬) \\" "\\ (•◡•) /")
+  	;; (sequence "TORATE(R)" "|" "ಠ╭╮ಠ" "\/ (¬_¬) \\" "\\ (•◡•) /" "ಠ_ಥ")
           (sequence "❍(W)" "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
   

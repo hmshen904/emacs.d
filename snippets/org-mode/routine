@@ -8,15 +8,7 @@
 *** ☐ Daily Planning
 - [ ] Plan the food
 - [ ] Plan the work
-  - email
-  - research
-  - teaching
-  - service
-  - new tasks/projects to complete?
 - [ ] Plan my life
-  - email
-  - workouts
-  - reading
 *** ☐ Breakfast
 *** ☐ Lunch
 *** ☐ Dinner
@@ -34,7 +26,7 @@
 ** Service [/]
 *** ☐
 ** Others [/]
-*** ☐
+*** ☐ Emails
 ** Clocktable
 
 #+BEGIN: clocktable :scope tree1 :maxlevel 3 :block untilnow

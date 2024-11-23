@@ -495,7 +495,7 @@ From a stylistic perspective (completely personal preference) I:
       ;; jumpers
       "j"   '(:ignore t :which-key "jump")
       ;; https://www.reddit.com/r/emacs/comments/3e1ozx/acejumpmode_is_dead_long_live_avy/
-      "jj"  'avy-goto-word-1
+      "jj"  'avy-goto-char-2
       "jl"  'avy-goto-line
       "jn"  'evilem-motion-next-visual-line
       "jp"  'evilem-motion-previous-visual-line
@@ -1140,7 +1140,8 @@ Org-mode was first loaded in early-init.el
 #+begin_src emacs-lisp :tangle no
   (setq org-todo-keywords
         '((sequence "ACTIVE(a)" "WAITING(w)" "TODO(t)" "|" "DONE(d)" "CANCELLED(c)" "FAILED(f)")
-  	(sequence "TORATE(R)" "|" "ಠ╭╮ಠ"  "\ (•◡•) /" "ಠ_ಥ")
+  	(sequence "TORATE(R)" "|" "\/ (¬_¬) \\" "\\ (•◡•) /")
+  	;; (sequence "TORATE(R)" "|" "ಠ╭╮ಠ" "\/ (¬_¬) \\" "\\ (•◡•) /" "ಠ_ಥ")
           (sequence "❍(W)" "☐(T)" "|" "☑(D)" "☒(C)")
           (sequence "NEXT(n)" "IN-PROGRESS(I)" "WAITING(w)" "LATER(l)" "|" "CANCELLED(c)" "FAILED(f)")))
 

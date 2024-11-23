@@ -172,7 +172,7 @@
     ;; jumpers
     "j"   '(:ignore t :which-key "jump")
     ;; https://www.reddit.com/r/emacs/comments/3e1ozx/acejumpmode_is_dead_long_live_avy/
-    "jj"  'avy-goto-word-1
+    "jj"  'avy-goto-char-2
     "jl"  'avy-goto-line
     "jn"  'evilem-motion-next-visual-line
     "jp"  'evilem-motion-previous-visual-line
