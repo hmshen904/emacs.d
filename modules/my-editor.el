@@ -250,11 +250,11 @@
 
     "a"   '(:ignore t :which-key "Applications")
     "ac"  'calendar
-    "at"  'open-iTerm-here
-    "af"  'open-Finder-here
 
     "o"   '(:ignore t :which-key "Open...")
-    "of"  'make-frame
+    "oF"  'make-frame
+    "ot"  'open-iTerm-here
+    "of"  'open-Finder-here
 
     "wh"  'evil-window-left
     "wl"  'evil-window-right

@@ -251,6 +251,12 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
   (setq my-init-file my-org-inbox)
 #+end_src
 
+#+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
+  ;; add PATH for AUCTEX
+  (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
+  (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+#+end_src
+
 ** my functions
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
@@ -573,11 +579,11 @@ From a stylistic perspective (completely personal preference) I:
 
       "a"   '(:ignore t :which-key "Applications")
       "ac"  'calendar
-      "at"  'open-iTerm-here
-      "af"  'open-Finder-here
 
       "o"   '(:ignore t :which-key "Open...")
-      "of"  'make-frame
+      "oF"  'make-frame
+      "ot"  'open-iTerm-here
+      "of"  'open-Finder-here
 
       "wh"  'evil-window-left
       "wl"  'evil-window-right
@@ -874,6 +880,13 @@ From a stylistic perspective (completely personal preference) I:
   (load-anti-zenburn)
   ;; (load-leuven-light)
   (my/pad-mode-line)
+#+end_src
+
+** window splitting
+
+#+begin_src emacs-lisp :tangle "modules/my-ui.el" :mkdirp yes
+(setq split-height-threshold nil)
+(setq split-width-threshold 0)
 #+end_src
 
 ** dired file management
@@ -1183,6 +1196,10 @@ Org-mode was first loaded in early-init.el
   ;; control where the todo popup appears
   ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
   (setq org-use-fast-todo-selection 'expert)
+
+  ;; org-clock rounding
+  ;; source: https://emacs.stackexchange.com/questions/36249/rounding-time-up-to-multiple-of-x-in-when-using-org-clock
+  (setq org-clock-rounding-minutes 5)
 
 
   ;; https://stackoverflow.com/questions/17239273/org-mode-buffer-latex-syntax-highlighting
@@ -1900,28 +1917,20 @@ https://orgmode.org/manual/Template-expansion.html#Template-expansion
 
     (setq TeX-view-program-selection
           '(
-            (output-pdf "Skim")
   	  (output-pdf "PDF Tools")
+            (output-pdf "Skim")
             (output-dvi "open")
             (output-pdf "open")
             (output-html "open")
             (output-pdf "preview-pane")))
-
 
     ;; (setq TeX-quote-after-quote t)
 
     (setq TeX-view-program-list
-  	'(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+  	'(
   	  ("PDF Tools" TeX-pdf-tools-sync-view)
+  	  ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
   	  ("preview-pane" latex-preview-pane-mode)))
-
-    (setq TeX-view-program-selection
-          '((output-pdf "Skim")
-  	  (output-pdf "PDF Tools")
-            (output-dvi "open")
-            (output-pdf "open")
-            (output-html "open")
-            (output-pdf "preview-pane")))
     )
 #+end_src
 

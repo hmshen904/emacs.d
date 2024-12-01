@@ -17,28 +17,20 @@
 
   (setq TeX-view-program-selection
         '(
-          (output-pdf "Skim")
 	  (output-pdf "PDF Tools")
+          (output-pdf "Skim")
           (output-dvi "open")
           (output-pdf "open")
           (output-html "open")
           (output-pdf "preview-pane")))
-
 
   ;; (setq TeX-quote-after-quote t)
 
   (setq TeX-view-program-list
-	'(("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+	'(
 	  ("PDF Tools" TeX-pdf-tools-sync-view)
+	  ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
 	  ("preview-pane" latex-preview-pane-mode)))
-
-  (setq TeX-view-program-selection
-        '((output-pdf "Skim")
-	  (output-pdf "PDF Tools")
-          (output-dvi "open")
-          (output-pdf "open")
-          (output-html "open")
-          (output-pdf "preview-pane")))
   )
 
 (use-package tex

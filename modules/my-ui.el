@@ -136,6 +136,9 @@
 ;; (load-leuven-light)
 (my/pad-mode-line)
 
+(setq split-height-threshold nil)
+(setq split-width-threshold 0)
+
 (require'dired)
 (setf dired-kill-when-opening-new-dired-buffer t) ;; only open one buffer (need emacs 28+)
 ;; Additional configurations

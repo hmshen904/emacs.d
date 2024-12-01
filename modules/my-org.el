@@ -118,6 +118,10 @@
   ;; source: https://emacs.stackexchange.com/questions/14817/how-to-control-where-the-org-todo-keywords-buffer-displays/17133#17133
   (setq org-use-fast-todo-selection 'expert)
   
+  ;; org-clock rounding
+  ;; source: https://emacs.stackexchange.com/questions/36249/rounding-time-up-to-multiple-of-x-in-when-using-org-clock
+  (setq org-clock-rounding-minutes 5)
+  
   
   ;; https://stackoverflow.com/questions/17239273/org-mode-buffer-latex-syntax-highlighting
   (setq org-highlight-latex-and-related '(latex script entities))

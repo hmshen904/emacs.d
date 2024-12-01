@@ -125,6 +125,10 @@
 
 (setq my-init-file my-org-inbox)
 
+;; add PATH for AUCTEX
+(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
+(setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+
 ;; source: https://gist.github.com/jstewart/7664823
 (defun my/notify-osx (title message)
   (call-process "terminal-notifier"
