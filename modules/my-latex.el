@@ -17,8 +17,8 @@
 
   (setq TeX-view-program-selection
         '(
-	  (output-pdf "PDF Tools")
           (output-pdf "Skim")
+	  (output-pdf "PDF Tools")
           (output-dvi "open")
           (output-pdf "open")
           (output-html "open")
@@ -28,8 +28,8 @@
 
   (setq TeX-view-program-list
 	'(
-	  ("PDF Tools" TeX-pdf-tools-sync-view)
 	  ("Skim" "/Applications/Skim.app/Contents/SharedSupport/displayline -b -g %n %o %b")
+	  ("PDF Tools" TeX-pdf-tools-sync-view)
 	  ("preview-pane" latex-preview-pane-mode)))
   )
 

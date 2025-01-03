@@ -52,7 +52,7 @@
     ;; "t"  '(:ignore t :which-key "org-entry")
     ;; "tp" 'org-priority use shift + arrow keys instead
   
-    "t" 'org-todo
+    "T" 'org-todo
   
     "r"  '(:ignore t :which-key "org-refile")
     "rr" 'org-refile
@@ -60,6 +60,11 @@
   
     "a"   'org-archive-subtree
     "p"   'org-set-property
+    "q"   'org-set-tags-command
+    "z"   'org-add-note
+  
+    "S"   'org-schedule
+    "D"   'org-deadline
   
     "c"  '(:ignore t :which-key "org-clock")
     "ci" 'org-clock-in
@@ -69,6 +74,7 @@
     "cm" 'org-clock-modify-effort-estimate
     "cp" 'org-pomodoro
     "cP" 'org-pomodoro-extend-last-clock
+  
     )
   :config
   (require 'ox-gfm nil t)
@@ -104,7 +110,7 @@
   
   ;; Source: https://emacs.stackexchange.com/questions/17302/is-there-a-way-to-make-org-mode-count-repetitive-tasks-done-certain-hours-past-m
   ;;
-  (setq org-extend-today-until 5  ;; Treat 4 AM as the time when the following day begins (instead of midnight)
+  (setq org-extend-today-until 6  ;; Treat 4 AM as the time when the following day begins (instead of midnight)
         org-use-effective-time t) ;; If you're up at say 1 AM like me right now, treat the time when you mark a TODO as done as 23:59 of the previous day, sensu stricto
   
   ;; use mm-dd-yyyy
@@ -428,6 +434,28 @@
   (advice-add 'org-agenda-quit :before 'org-save-all-org-buffers)
   
   
+  ;; https://librephoenix.com/2023-12-30-making-org-agenda-look-beautiful
+  ;; Only show one day of the agenda at a time
+  (setq org-agenda-span 3
+        org-agenda-start-day "+0d")
+  
+  ;; Hide duplicates of the same todo item
+  ;; If it has more than one of timestamp, scheduled,
+  ;; or deadline information
+  (setq org-agenda-skip-timestamp-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-agenda-skip-timestamp-if-deadline-is-shown t)
+  
+  (setq org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-include-deadlines t
+        org-agenda-block-separator t
+        org-agenda-tags-column 100 ;; from testing this seems to be a good value
+        ;; org-agenda-compact-blocks t
+      )
+  
   (setq bibtex-dialect 'biblatex) ;;; ???? should it be here ?
   (setq org-e-latex-tables-booktabs t)
   (setq org-latex-pdf-process
@@ -560,20 +588,20 @@
   :init
   (setq org-super-agenda-groups
        '(;; Each group has an implicit boolean OR operator between its selectors.
-         (:name "Today"  ; Optionally specify section name
+         (:name "Today & Scheduled"  ; Optionally specify section name
                 :time-grid t  ; Items that appear on the time grid
-                :todo "TODAY")  ; Items that have this TODO keyword
+                :todo "TODAY"
+		:scheduled past
+		)  ; Items that have this TODO keyword
          (:name "Important"
                 ;; Single arguments given alone
-                :tag "Projects"
+                ;;:tag "Projects"
                 :deadline today
                 :priority "A")
          (:name "Overdue"
                 :deadline past)
          (:name "Due soon"
                 :deadline future)
-         (:name "To read"
-                :tag "Papers")
          (:name "Personal"
                 :habit t)
          (:name "Less Important"
@@ -584,12 +612,37 @@
          (:name "Not Urgent"
                 :todo "TODO"
                 :order 9)))
-  (setq org-agenda-skip-scheduled-if-done t
-        org-agenda-skip-deadline-if-done t
-        org-agenda-include-deadlines t
-        org-agenda-block-separator t
-        org-agenda-tags-column 100 ;; from testing this seems to be a good value
-        org-agenda-compact-blocks t)
+
+  ;; (setq org-super-agenda-groups
+  ;;      '(;; Each group has an implicit boolean OR operator between its selectors.
+  ;;        (:name "Today"  ; Optionally specify section name
+  ;;               :time-grid t  ; Items that appear on the time grid
+  ;;               :todo today)  ; Items that have this TODO keyword
+  ;;        (:name "Important"
+  ;;               ;; Single arguments given alone
+  ;;               ;; :tag "@proj"
+  ;;               :deadline today
+  ;;               :priority "A")
+  ;;        ;; (:name "Important"
+  ;;        ;;        ;; Single arguments given alone
+  ;;        ;;        ;; :tag "@proj"
+  ;; 	 ;; 	;; :children nil
+  ;;        ;;        :priority "A")
+  ;;        (:name "Scheduled"
+  ;;               :scheduled past)
+  ;;        (:name "Overdue"
+  ;;               :deadline past)
+  ;;        (:name "Due soon"
+  ;;               :deadline future)
+  ;;        (:name "Personal"
+  ;;               :habit t)
+  ;;        (:todo ("WAITING" "LATER")
+  ;;               :order 8)
+  ;;        (:name "Not Urgent"
+  ;;               :todo "TODO"
+  ;;               :order 9)
+  ;; 	 )
+  ;;      )
   :config
   (org-super-agenda-mode))
 
