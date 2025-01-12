@@ -126,8 +126,18 @@
 (setq my-init-file my-org-inbox)
 
 ;; add PATH for AUCTEX
-(setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
-(setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
+;; (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+
+(use-package exec-path-from-shell
+  :ensure t
+  :diminish
+  :if (memq window-system '(mac ns x))
+  :config
+  (dolist (var '("TEXINPUTS"))
+    (add-to-list 'exec-path-from-shell-variables var))
+  (exec-path-from-shell-initialize)
+  )
 
 ;; source: https://gist.github.com/jstewart/7664823
 (defun my/notify-osx (title message)

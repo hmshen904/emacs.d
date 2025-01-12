@@ -253,8 +253,19 @@ This is where I define the Lisp macros used in my setup and load all the invidiu
 
 #+begin_src emacs-lisp :tangle "modules/my-defaults.el" :mkdirp yes
   ;; add PATH for AUCTEX
-  (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
-  (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+  ;; (setenv "PATH" (concat (getenv "PATH") ":/Library/TeX/texbin/"))
+  ;; (setq exec-path (append exec-path '("/Library/TeX/texbin/")))
+
+  (use-package exec-path-from-shell
+    :ensure t
+    :diminish
+    :if (memq window-system '(mac ns x))
+    :config
+    (dolist (var '("TEXINPUTS"))
+      (add-to-list 'exec-path-from-shell-variables var))
+    (exec-path-from-shell-initialize)
+    )
+
 #+end_src
 
 ** my functions
