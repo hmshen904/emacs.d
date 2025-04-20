@@ -148,6 +148,30 @@
                 "-sender" "org.gnu.Emacs"
                 "-message" message))
 
+;; source: https://tex.stackexchange.com/questions/557959/emacs-auctex-tabular-vertical-alignment-of-cells
+(defun my/tabular-magic ()
+  (interactive)
+  (unless (string= (LaTeX-current-environment) "document")
+    (let ((s (make-marker))
+          (e (make-marker)))
+      (set-marker s (save-excursion
+                      (LaTeX-find-matching-begin)
+                      (forward-line)
+                      (point)))
+      (set-marker e (save-excursion
+                      (LaTeX-find-matching-end)
+                      (forward-line -1)
+                      (end-of-line)
+                      (point)))
+      ;; Delete the next 2 lines if you don't like indenting and removal
+      ;; of whitespaces:
+      (LaTeX-fill-environment nil)
+      (whitespace-cleanup-region s e)
+      (align-regexp s e "\\(\\s-*\\)&" 1 1 t)
+      (align-regexp s e "\\(\\s-*\\)\\\\\\\\")
+      (set-marker s nil)
+      (set-marker e nil))))
+
 (use-package diminish)
 
 (when (file-exists-p my-init-file)

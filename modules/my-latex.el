@@ -57,6 +57,7 @@
   (setq prettify-symbols-unprettify-at-point 'right-edge)
   (setq TeX-command-default "LaTeXmk")
   (local-leader LaTeX-mode-map
+    "A" 'my/tabular-magic
     "P" 'preview-at-point
     "m" 'TeX-command-master
     "c" 'TeX-command-run-all
@@ -84,8 +85,8 @@
           (?0 ("\\varnothing" "\\emptyset" ""))
           ;; (?{ ("\\min" "\\inf" ""))
           ;; (?} ("\\max" "\\sup" ""))
-          ;; (?< ("\\subseteq" "\\subset" ""))
-          ;; (?> ("\\supseteq" "\\supset" ""))
+          (?< ("\\subseteq" "\\subset" ""))
+          (?> ("\\supseteq" "\\supset" ""))
           (?D  ("\\Delta" "\\nabla" "\\displaystyle"))
           (?f ("\\phi" "\\varphi" ""))
           (?F ("\\Phi" "" ""))
@@ -129,8 +130,8 @@
         cdlatex-command-alist
         '(
           ("cmtb" "Insert Comment Box" "" cdlatex-environment ("comment box") t nil)
-          ;; ("im" "Insert \\Set{}" "\\(?\\)" cdlatex-position-cursor nil nil t)
-          ;; ("dm" "Insert \\Set{}" "\\[?\\]" cdlatex-position-cursor nil nil t)
+          ("im" "Insert \\Set{}" "\\(?\\)" cdlatex-position-cursor nil nil t)
+          ("dm" "Insert \\Set{}" "\\[?\\]" cdlatex-position-cursor nil nil t)
           ("Set" "Insert \\Set{}" "\\Set{?}" cdlatex-position-cursor nil nil t)
           ("set" "Insert \\set{}" "\\set{?}" cdlatex-position-cursor nil nil t)
           ("para" "Insert \\paragraph{}" "\\paragraph{?}" cdlatex-position-cursor nil t nil)
@@ -156,6 +157,13 @@
    :states '(normal insert)
    :keymaps '(cdlatex-mode-map org-mode-map)
    "M-;" 'cdlatex-tab)
+  ;;
+  ;; (general-def
+  ;;  :states '(insert)
+  ;;  :keymaps '(cdlatex-mode-map org-mode-map)
+  ;;  "$" 'cdlatex-dollar
+  ;;  )
+
   )
 
 ;; (defvar my-bib-files '("~/Dropbox/40-Scripts/texmf/tex/latex/local/master.bib"))

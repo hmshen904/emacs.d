@@ -110,7 +110,7 @@
   
   ;; Source: https://emacs.stackexchange.com/questions/17302/is-there-a-way-to-make-org-mode-count-repetitive-tasks-done-certain-hours-past-m
   ;;
-  (setq org-extend-today-until 6  ;; Treat 4 AM as the time when the following day begins (instead of midnight)
+  (setq org-extend-today-until 6  ;; Treat 6 AM as the time when the following day begins (instead of midnight)
         org-use-effective-time t) ;; If you're up at say 1 AM like me right now, treat the time when you mark a TODO as done as 23:59 of the previous day, sensu stricto
   
   ;; use mm-dd-yyyy
@@ -436,8 +436,8 @@
   
   ;; https://librephoenix.com/2023-12-30-making-org-agenda-look-beautiful
   ;; Only show one day of the agenda at a time
-  (setq org-agenda-span 3
-        org-agenda-start-day "+0d")
+  ;; (setq org-agenda-span 3
+  ;;       org-agenda-start-day "+0d")
   
   ;; Hide duplicates of the same todo item
   ;; If it has more than one of timestamp, scheduled,
